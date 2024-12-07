@@ -50,10 +50,10 @@ export class UserController {
           favoriteAdvertisement.id === body.advertisementId,
       );
       if (!favoriteAdvertisement) {
-        return await this.userService.createFavorite({
-          userId: user.id,
-          advertisementId: body.advertisementId,
-        });
+        return await this.userService.createFavorite(
+          user.id,
+          body.advertisementId,
+        );
       }
     }
   }
