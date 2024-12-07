@@ -20,7 +20,7 @@ export class AdvertisementService {
 
   public async findById(id: string): Promise<AdvertisementModel> {
     return await this.advertisementModel.findByPk(id, {
-      include: [{ model: FileModel, as: 'images', required: true }],
+      include: [{ model: FileModel, as: 'images', required: false }],
     });
   }
 

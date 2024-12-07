@@ -16,7 +16,7 @@ export class S3Service {
 
   constructor(private readonly configService: ConfigService) {
     this.endPoint = this.configService.get<string>('AWS_ENDPOINT');
-    this.bucketName = this.configService.get<string>('AWS_S3_BUCKET_NAME');
+    this.bucketName = this.configService.get<string>('AWS_BUCKET_NAME');
     this.filesPath = this.configService.get<string>('AWS_PATH');
     this.s3Client = new S3Client({
       endpoint: this.endPoint,

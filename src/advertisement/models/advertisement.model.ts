@@ -5,11 +5,12 @@ import {
   ForeignKey,
   BelongsTo,
   DataType,
-  Sequelize,
   HasMany,
+  BelongsToMany,
 } from 'sequelize-typescript';
 import { UserModel } from 'src/user/models/user.model';
 import { FileModel } from './image.model';
+import { FavoriteModel } from 'src/user/models/favorite.model';
 
 @Table({
   tableName: 'advertisements',
@@ -110,4 +111,7 @@ export class AdvertisementModel extends Model<AdvertisementModel> {
 
   @HasMany(() => FileModel)
   images: FileModel[];
+
+  @BelongsToMany(() => UserModel, () => FavoriteModel)
+  users: UserModel[];
 }

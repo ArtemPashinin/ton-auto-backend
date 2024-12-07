@@ -1,5 +1,13 @@
-import { Table, Column, Model, HasMany, DataType } from 'sequelize-typescript';
+import {
+  Table,
+  Column,
+  Model,
+  HasMany,
+  DataType,
+  BelongsToMany,
+} from 'sequelize-typescript';
 import { AdvertisementModel } from 'src/advertisement/models/advertisement.model';
+import { FavoriteModel } from './favorite.model';
 
 @Table({
   tableName: 'users',
@@ -44,4 +52,7 @@ export class UserModel extends Model<UserModel> {
 
   @HasMany(() => AdvertisementModel)
   advertisements: AdvertisementModel[];
+
+  @BelongsToMany(() => AdvertisementModel, () => FavoriteModel)
+  favoriteAdvertisements: AdvertisementModel[];
 }

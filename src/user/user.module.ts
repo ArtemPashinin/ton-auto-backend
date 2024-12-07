@@ -3,9 +3,15 @@ import { SequelizeModule } from '@nestjs/sequelize';
 import { UserModel } from './models/user.model';
 import { UserService } from './user.service';
 import { UserController } from './user.controller';
+import { FavoriteModel } from './models/favorite.model';
+import { AdvertisementModel } from 'src/advertisement/models/advertisement.model';
+import { AdvertisementsModule } from 'src/advertisement/advertisements.module';
 
 @Module({
-  imports: [SequelizeModule.forFeature([UserModel])],
+  imports: [
+    AdvertisementsModule,
+    SequelizeModule.forFeature([UserModel, FavoriteModel, AdvertisementModel]),
+  ],
   controllers: [UserController],
   providers: [UserService],
   exports: [UserService],
