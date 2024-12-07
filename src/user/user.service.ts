@@ -53,10 +53,10 @@ export class UserService {
     return await this.userModel.create(userDto);
   }
 
-  public async createFavorite(favorite: FavoriteDto): Promise<FavoriteModel> {
+  public async createFavorite(userId: number, advertisementId: string): Promise<FavoriteModel> {
     return await this.favoriteModel.create({
-      user_id: favorite.userId,
-      advertisement_id: favorite.advertisementId,
+      user_id: userId,
+      advertisement_id: advertisementId,
     });
   }
 
