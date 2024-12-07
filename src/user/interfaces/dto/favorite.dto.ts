@@ -1,4 +1,6 @@
+import { FindtUserDto } from "./find-user.dto";
+
 export interface FavoriteDto {
-  userId: number;
+  userId: FindtUserDto;
   advertisementId: string;
 }

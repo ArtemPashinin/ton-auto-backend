@@ -5,6 +5,7 @@ import {
   Param,
   ParseIntPipe,
   Post,
+  Query,
   UseFilters,
 } from '@nestjs/common';
 import { UserService } from './user.service';
@@ -17,6 +18,8 @@ import { FavoriteDto } from './interfaces/dto/favorite.dto';
 import { favoriteSchema } from './validators/schemas/favortie.schema';
 import { AdvertisementService } from 'src/advertisement/advertisements.service';
 import { FavoriteModel } from './models/favorite.model';
+import { FindtUserDto } from './interfaces/dto/find-user.dto';
+import { findUserSchema } from './validators/schemas/find-user.schema';
 
 @Controller('user')
 @UseFilters(UserExceptionFilter)
@@ -26,21 +29,32 @@ export class UserController {
     private readonly advertisementService: AdvertisementService,
   ) {}
 
-  @Get(':id')
-  public async findOneByTgId(@Param('id', ParseIntPipe) id: number) {
-    return await this.userService.findOneByTgId(id);
+  @Get()
+  public async findOneByTgId(
+    @Query(new UserValidationPipe(findUserSchema)) userId: FindtUserDto,
+  ) {
+    return await this.userService.findOne(userId);
   }
 
   @Post('favorite')
   public async addFavorite(
     @Body(new UserValidationPipe(favoriteSchema)) body: FavoriteDto,
   ): Promise<FavoriteModel> {
-    const user = await this.userService.findOneById(body.userId);
+    const user = await this.userService.findOne(body.userId);
     const advertisement = await this.advertisementService.findById(
       body.advertisementId,
     );
     if (user && advertisement) {
-      return await this.userService.createFavorite(body);
+      const favoriteAdvertisement = user.favoriteAdvertisements.find(
+        (favoriteAdvertisement) =>
+          favoriteAdvertisement.id === body.advertisementId,
+      );
+      if (!favoriteAdvertisement) {
+        return await this.userService.createFavorite({
+          userId: user.id,
+          advertisementId: body.advertisementId,
+        });
+      }
     }
   }
 
