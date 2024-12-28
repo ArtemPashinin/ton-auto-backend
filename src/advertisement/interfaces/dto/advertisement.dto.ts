@@ -1,15 +1,15 @@
+import { MetaDto } from './meta.dto';
+
 export interface AdvertisementDto {
   id?: string;
   user_id: number;
-  make: string;
-  model: string;
+  model_id: number;
   year: number;
   hp: number;
   mileage: number;
-  engine: string;
-  color: string;
-  region: string;
+  engine_id: number;
+  color_id: number;
   price: number;
   description: string;
-  currency: string;
+  meta: MetaDto[];
 }

@@ -20,6 +20,8 @@ import { AdvertisementService } from 'src/advertisement/advertisements.service';
 import { FavoriteModel } from './models/favorite.model';
 import { FindtUserDto } from './interfaces/dto/find-user.dto';
 import { findUserSchema } from './validators/schemas/find-user.schema';
+import { CountryModel } from './models/country.model';
+import { CityModel } from './models/city.model';
 
 @Controller('user')
 @UseFilters(UserExceptionFilter)
@@ -30,10 +32,22 @@ export class UserController {
   ) {}
 
   @Get()
-  public async findOneByTgId(
+  public async findOne(
     @Query(new UserValidationPipe(findUserSchema)) userId: FindtUserDto,
-  ) {
+  ): Promise<UserModel> {
     return await this.userService.findOne(userId);
+  }
+
+  @Get('countries')
+  public async getCountries(): Promise<CountryModel[]> {
+    return await this.userService.findAllCountries();
+  }
+
+  @Get('cities/:id')
+  public async getCities(
+    @Param('id', ParseIntPipe) id: number,
+  ): Promise<CityModel[]> {
+    return await this.userService.findCities(id);
   }
 
   @Post('favorite')
@@ -61,7 +75,7 @@ export class UserController {
   @Post()
   public async createOne(
     @Body(new UserValidationPipe(userSchema)) body: UserDto,
-  ): Promise<UserModel> {
+  ): Promise<boolean> {
     return await this.userService.createOne(body);
   }
 }

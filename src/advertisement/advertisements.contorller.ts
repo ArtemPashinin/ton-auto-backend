@@ -9,6 +9,7 @@ import {
   ParseIntPipe,
   Post,
   Put,
+  Query,
   UploadedFile,
   UploadedFiles,
   UseInterceptors,
@@ -21,6 +22,11 @@ import { AdvertisementDto } from './interfaces/dto/advertisement.dto';
 import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
 import { S3Service } from 'src/s3/s3.service';
 import { FileModel } from './models/image.model';
+import { ConditionModel } from '../vehicle/models/condition.model';
+import { MediaDto } from './interfaces/dto/mediaData.dto';
+import { QueryDto } from './interfaces/dto/query.dto';
+import { QueryValidationPipe } from './validators/qery.validation.pipe';
+import { querySchema } from './validators/schemas/query.schema';
 
 @Controller('advertisements')
 export class AdvertisementsController {
@@ -31,8 +37,11 @@ export class AdvertisementsController {
   ) {}
 
   @Get()
-  public async findAll(): Promise<AdvertisementModel[]> {
-    return await this.advertisementsService.finAll();
+  public async findAll(
+    @Query(new QueryValidationPipe(querySchema)) query: QueryDto,
+  ): Promise<AdvertisementModel[]> {
+    console.log(query);
+    return await this.advertisementsService.finAll(query);
   }
 
   @Get(':id')
@@ -48,35 +57,45 @@ export class AdvertisementsController {
     @UploadedFiles(
       new ParseFilePipe({
         validators: [new FileTypeValidator({ fileType: /^image\// })],
-        fileIsRequired: true,
+        fileIsRequired: false,
       }),
     )
     files: Express.Multer.File[],
   ): Promise<AdvertisementModel> {
+    //
+    console.log(body);
     const advertisement = await this.advertisementsService.createOne(body);
     const imageUrls = await this.s3Service.uploadMultipleFiles(files);
-    await this.advertisementsService.addFiles(imageUrls, advertisement.id);
+    const mediaData = [] as MediaDto[];
+    imageUrls.map((imageUrl, index) => {
+      mediaData.push({
+        url: imageUrl,
+        order: body.meta[index].order,
+        main: body.meta[index].main,
+      });
+    });
+    await this.advertisementsService.addFiles(mediaData, advertisement.id);
     return advertisement;
   }
 
-  @Post(':id/files')
-  @UseInterceptors(FileInterceptor('file'))
-  public async addOneFile(
-    @Param('id') id: string,
-    @UploadedFile(
-      new ParseFilePipe({
-        validators: [new FileTypeValidator({ fileType: /^image\// })],
-        fileIsRequired: true,
-      }),
-    )
-    file: Express.Multer.File,
-  ): Promise<FileModel> {
-    const advertisement = await this.advertisementsService.findById(id);
-    if (advertisement) {
-      const fileUrl = await this.s3Service.uploadFile(file);
-      return await this.advertisementsService.addFile(fileUrl, id);
-    }
-  }
+  // @Post(':id/files')
+  // @UseInterceptors(FileInterceptor('file'))
+  // public async addOneFile(
+  //   @Param('id') id: string,
+  //   @UploadedFile(
+  //     new ParseFilePipe({
+  //       validators: [new FileTypeValidator({ fileType: /^image\// })],
+  //       fileIsRequired: true,
+  //     }),
+  //   )
+  //   file: Express.Multer.File,
+  // ): Promise<FileModel> {
+  //   const advertisement = await this.advertisementsService.findById(id);
+  //   if (advertisement) {
+  //     const fileUrl = await this.s3Service.uploadFile(file);
+  //     return await this.advertisementsService.addFile(fileUrl, id);
+  //   }
+  // }
 
   @Put(':id')
   public async updateOne(
@@ -91,8 +110,8 @@ export class AdvertisementsController {
   public async deleteOne(@Param('id') id: string) {
     const advertisement = await this.advertisementsService.findById(id);
     if (advertisement) {
-      const { id: advertisementId, images } = advertisement;
-      const imagesUrl = images.map((image) => image.image_url);
+      const { id: advertisementId, media } = advertisement;
+      const imagesUrl = media.map((image) => image.image_url);
       await this.s3Service.deleteMultipleFiles(imagesUrl);
       await this.advertisementsService.deleteById(advertisementId);
     }
@@ -106,7 +125,7 @@ export class AdvertisementsController {
     const advertisement =
       await this.advertisementsService.findById(advertisementId);
     if (advertisement) {
-      const file = advertisement.images.find((image) => image.id === fileId);
+      const file = advertisement.media.find((image) => image.id === fileId);
       if (file) await this.advertisementsService.deleteFile(fileId);
     }
   }

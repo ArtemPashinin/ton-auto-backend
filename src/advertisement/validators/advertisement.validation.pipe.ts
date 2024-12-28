@@ -16,6 +16,6 @@ export class AdvertisementValidationPipe implements PipeTransform {
       throw new HttpException(error.details[0].message, HttpStatus.BAD_REQUEST);
     }
 
-    return value;
+    return { ...value, meta: JSON.parse(value.meta) };
   }
 }

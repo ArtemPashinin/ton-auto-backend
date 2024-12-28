@@ -37,7 +37,9 @@ export class S3Service {
 
   public async uploadFile(file: Express.Multer.File): Promise<string> {
     const uuid = uuid4();
-    const key = `${this.filesPath}/${uuid}-${file.originalname}`;
+    const key = `${this.filesPath}/${uuid}-${file.originalname}`
+      .replace(/\s+/g, '')
+      .trim();
 
     await this.s3Client.send(
       new PutObjectCommand({

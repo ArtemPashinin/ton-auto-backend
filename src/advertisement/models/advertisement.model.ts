@@ -11,6 +11,11 @@ import {
 import { UserModel } from 'src/user/models/user.model';
 import { FileModel } from './image.model';
 import { FavoriteModel } from 'src/user/models/favorite.model';
+import { ConditionModel } from '../../vehicle/models/condition.model';
+import { MakeModel } from 'src/vehicle/models/make.model';
+import { CarModel } from 'src/vehicle/models/car-model.model';
+import { EngineModel } from 'src/vehicle/models/engine.model';
+import { ColorModel } from 'src/vehicle/models/color.model';
 
 @Table({
   tableName: 'advertisements',
@@ -34,18 +39,6 @@ export class AdvertisementModel extends Model<AdvertisementModel> {
   user: UserModel;
 
   @Column({
-    type: DataType.CHAR(128),
-    allowNull: true,
-  })
-  make: string;
-
-  @Column({
-    type: DataType.CHAR(128),
-    allowNull: true,
-  })
-  model: string;
-
-  @Column({
     type: DataType.INTEGER,
     allowNull: true,
   })
@@ -63,23 +56,19 @@ export class AdvertisementModel extends Model<AdvertisementModel> {
   })
   mileage: number;
 
-  @Column({
-    type: DataType.CHAR(128),
-    allowNull: true,
-  })
-  engine: string;
+  @ForeignKey(() => EngineModel)
+  @Column({ type: DataType.INTEGER, allowNull: false })
+  engine_id: number;
 
-  @Column({
-    type: DataType.CHAR(128),
-    allowNull: true,
-  })
-  color: string;
+  @BelongsTo(() => EngineModel)
+  engine: EngineModel;
 
-  @Column({
-    type: DataType.CHAR(128),
-    allowNull: true,
-  })
-  region: string;
+  @ForeignKey(() => ColorModel)
+  @Column({ type: DataType.INTEGER, allowNull: false })
+  color_id: number;
+
+  @BelongsTo(() => ColorModel)
+  color: ColorModel;
 
   @Column({
     type: DataType.INTEGER,
@@ -103,15 +92,23 @@ export class AdvertisementModel extends Model<AdvertisementModel> {
   })
   updatedAt: Date;
 
-  @Column({
-    type: DataType.CHAR(6),
-    allowNull: true,
-  })
-  currency: string;
+  @ForeignKey(() => ConditionModel)
+  @Column({ type: DataType.INTEGER, allowNull: true })
+  condition_id: number;
+
+  @BelongsTo(() => ConditionModel)
+  condition: ConditionModel;
+
+  @ForeignKey(() => CarModel)
+  @Column({ type: DataType.INTEGER, allowNull: true })
+  model_id: number;
+
+  @BelongsTo(() => CarModel)
+  model: CarModel;
 
   @HasMany(() => FileModel)
-  images: FileModel[];
+  media: FileModel[];
 
   @BelongsToMany(() => UserModel, () => FavoriteModel)
-  users: UserModel[];
+  favoritedBy: UserModel[];
 }

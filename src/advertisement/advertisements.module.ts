@@ -7,10 +7,17 @@ import { AdvertisementsController } from './advertisements.contorller';
 import { FileModel } from './models/image.model';
 import { S3Module } from 'src/s3/s3.module';
 import { FavoriteModel } from 'src/user/models/favorite.model';
+import { ConditionModel } from '../vehicle/models/condition.model';
 
 @Module({
   imports: [
-    SequelizeModule.forFeature([AdvertisementModel, UserModel, FileModel, FavoriteModel]),
+    SequelizeModule.forFeature([
+      AdvertisementModel,
+      UserModel,
+      FileModel,
+      FavoriteModel,
+      ConditionModel,
+    ]),
     S3Module,
   ],
   controllers: [AdvertisementsController],

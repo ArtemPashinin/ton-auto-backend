@@ -5,9 +5,14 @@ import {
   HasMany,
   DataType,
   BelongsToMany,
+  ForeignKey,
+  BelongsTo,
 } from 'sequelize-typescript';
 import { AdvertisementModel } from 'src/advertisement/models/advertisement.model';
 import { FavoriteModel } from './favorite.model';
+import { CountryModel } from './country.model';
+import { number } from 'joi';
+import { CityModel } from './city.model';
 
 @Table({
   tableName: 'users',
@@ -26,7 +31,7 @@ export class UserModel extends Model<UserModel> {
   })
   user_id: number;
 
-  @Column({ type: DataType.CHAR(128), allowNull: false })
+  @Column({ type: DataType.CHAR(128), allowNull: true })
   username: string;
 
   @Column({
@@ -46,6 +51,13 @@ export class UserModel extends Model<UserModel> {
     allowNull: true,
   })
   phone: string;
+
+  @ForeignKey(() => CityModel)
+  @Column({ type: DataType.INTEGER, allowNull: true })
+  city_id: number;
+
+  @BelongsTo(() => CityModel)
+  city: CountryModel;
 
   @Column({ type: DataType.CHAR(6), defaultValue: 'en' })
   language_code: string;

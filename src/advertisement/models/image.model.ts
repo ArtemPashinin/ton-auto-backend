@@ -4,6 +4,7 @@ import {
   Table,
   ForeignKey,
   BelongsTo,
+  DataType,
 } from 'sequelize-typescript';
 import { AdvertisementModel } from './advertisement.model';
 @Table({ tableName: 'images', timestamps: true })
@@ -23,4 +24,10 @@ export class FileModel extends Model<FileModel> {
 
   @BelongsTo(() => AdvertisementModel)
   advertisement: AdvertisementModel;
+
+  @Column({ type: DataType.INTEGER, allowNull: false })
+  order: number;
+
+  @Column({ type: DataType.BOOLEAN, allowNull: false })
+  main: boolean;
 }

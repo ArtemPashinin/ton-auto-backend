@@ -2,8 +2,7 @@ import * as Joi from 'joi';
 
 export const advertisementSchema = Joi.object({
   user_id: Joi.number().integer().required(),
-  make: Joi.string().max(128).required(),
-  model: Joi.string().max(128).required(),
+  model_id: Joi.number().required(),
   year: Joi.number()
     .integer()
     .min(1900)
@@ -11,10 +10,10 @@ export const advertisementSchema = Joi.object({
     .required(),
   hp: Joi.number().integer().min(0).required(),
   mileage: Joi.number().integer().min(0).required(),
-  engine: Joi.string().max(128).required(),
-  color: Joi.string().max(128).required(),
-  region: Joi.string().max(128).required(),
+  engine_id: Joi.number().required(),
+  color_id: Joi.number().required(),
   price: Joi.number().integer().min(0).required(),
   description: Joi.string().required(),
-  currency: Joi.string().required(),
+  condition_id: Joi.number().integer().required(),
+  meta: Joi.string().required(),
 });
