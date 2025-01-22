@@ -30,14 +30,6 @@ export class UserComposer implements OnModuleInit {
   }
 
   private async start(ctx: Context): Promise<void> {
-    const media = InputMediaBuilder.photo(
-      new InputFile(
-        new URL(
-          'https://s3.ru1.storage.beget.cloud/8f8514fa4b7f-uncreative-gustofer/images/767ac05a-89ba-4309-9ab5-388db943cdb1-Frame52.jpg',
-        ),
-      ),
-      { caption: 'Cool!', parse_mode: 'HTML' },
-    );
-    await ctx.replyWithMediaGroup([media]);
+    await ctx.reply('Hi!');
   }
 }
