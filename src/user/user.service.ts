@@ -86,5 +86,27 @@ export class UserService {
     });
   }
 
-  public async removeFavorite() {}
+  public async removeFavorite(
+    userId: number,
+    advertisementId: string,
+  ): Promise<void> {
+    await this.favoriteModel.destroy({
+      where: { user_id: userId, advertisement_id: advertisementId },
+    });
+  }
+
+  public async updateOne(
+    userId: FindtUserDto,
+    data: UserDto,
+  ): Promise<UserModel> {
+    await this.userModel.update(data, {
+      where: {
+        [Op.or]: [
+          userId.id ? { id: userId.id } : {},
+          userId.tgId ? { user_id: userId.tgId } : {},
+        ],
+      },
+    });
+    return await this.findOne(userId);
+  }
 }

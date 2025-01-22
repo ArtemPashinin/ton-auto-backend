@@ -8,4 +8,11 @@ export interface QueryDto {
   country?: number;
   city?: number;
   userId?: number;
+  yearFrom?: number;
+  yearTo?: number;
+  mileageFrom?: number;
+  mileageTo?: number;
+  favorites?: boolean;
+  commercial?: boolean;
+  owned?: boolean;
 }

@@ -5,6 +5,7 @@ import {
   Param,
   ParseIntPipe,
   Post,
+  Put,
   Query,
   UseFilters,
 } from '@nestjs/common';
@@ -64,11 +65,16 @@ export class UserController {
           favoriteAdvertisement.id === body.advertisementId,
       );
       if (!favoriteAdvertisement) {
-        return await this.userService.createFavorite(
-          user.id,
-          body.advertisementId,
-        );
+        try {
+          return await this.userService.createFavorite(
+            user.id,
+            body.advertisementId,
+          );
+        } catch (err) {
+          console.log(err);
+        }
       }
+      await this.userService.removeFavorite(user.id, body.advertisementId);
     }
   }
 
@@ -77,5 +83,14 @@ export class UserController {
     @Body(new UserValidationPipe(userSchema)) body: UserDto,
   ): Promise<boolean> {
     return await this.userService.createOne(body);
+  }
+
+  @Put()
+  public async updateOne(
+    @Query(new UserValidationPipe(findUserSchema)) userId: FindtUserDto,
+    @Body(new UserValidationPipe(userSchema))
+    body: UserDto,
+  ): Promise<UserModel> {
+    return await this.userService.updateOne(userId, body);
   }
 }

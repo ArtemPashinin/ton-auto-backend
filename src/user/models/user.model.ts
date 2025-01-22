@@ -57,7 +57,7 @@ export class UserModel extends Model<UserModel> {
   city_id: number;
 
   @BelongsTo(() => CityModel)
-  city: CountryModel;
+  city: CityModel;
 
   @Column({ type: DataType.CHAR(6), defaultValue: 'en' })
   language_code: string;

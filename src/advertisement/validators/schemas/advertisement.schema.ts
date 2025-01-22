@@ -15,5 +15,6 @@ export const advertisementSchema = Joi.object({
   price: Joi.number().integer().min(0).required(),
   description: Joi.string().required(),
   condition_id: Joi.number().integer().required(),
-  meta: Joi.string().required(),
+  meta: Joi.string().optional(),
+  commercial: Joi.boolean().required(),
 });

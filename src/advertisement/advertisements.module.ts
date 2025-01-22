@@ -8,9 +8,11 @@ import { FileModel } from './models/image.model';
 import { S3Module } from 'src/s3/s3.module';
 import { FavoriteModel } from 'src/user/models/favorite.model';
 import { ConditionModel } from '../vehicle/models/condition.model';
+import { BotModule } from 'src/bot/bot.module';
 
 @Module({
   imports: [
+    BotModule,
     SequelizeModule.forFeature([
       AdvertisementModel,
       UserModel,

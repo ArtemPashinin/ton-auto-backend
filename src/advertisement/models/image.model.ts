@@ -9,6 +9,9 @@ import {
 import { AdvertisementModel } from './advertisement.model';
 @Table({ tableName: 'images', timestamps: true })
 export class FileModel extends Model<FileModel> {
+  @Column({ type: DataType.INTEGER, primaryKey: true, autoIncrement: true })
+  id: number;
+
   @Column
   image_url: string;
 
