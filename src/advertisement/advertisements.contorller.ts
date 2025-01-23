@@ -78,7 +78,9 @@ export class AdvertisementsController {
     });
     await this.advertisementsService.addFiles(mediaData, id);
     const advertisement = await this.advertisementsService.findById(id);
-    await this.telegramBot.sendAdvertisementToGroup(advertisement);
+    const postsId =
+      await this.telegramBot.sendAdvertisementToGroup(advertisement);
+    await this.advertisementsService.createPosts(id, postsId);
     return advertisement;
   }
 
@@ -145,7 +147,9 @@ export class AdvertisementsController {
   public async deleteOne(@Param('id') id: string) {
     const advertisement = await this.advertisementsService.findById(id);
     if (advertisement) {
-      const { id: advertisementId, media } = advertisement;
+      const { id: advertisementId, media, posts } = advertisement;
+      const postsId = posts.map(({ post_id }) => post_id);
+      await this.telegramBot.removePosts(postsId);
       const imagesUrl = media.map((image) => image.image_url);
       await this.s3Service.deleteMultipleFiles(imagesUrl);
       await this.advertisementsService.deleteById(advertisementId);

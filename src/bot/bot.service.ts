@@ -49,9 +49,21 @@ export class TelegramBot {
     await this.bot.api.sendMessage(this.errorLogChatId, JSON.stringify(error));
   }
 
-  public async sendAdvertisementToGroup(advertisement: AdvertisementModel) {
+  public async sendAdvertisementToGroup(
+    advertisement: AdvertisementModel,
+  ): Promise<number[]> {
     const caption = createAdvertisementMessage(advertisement);
     const mediaGroup = mediaBuilder(advertisement.media, caption);
-    await this.bot.api.sendMediaGroup(this.mainGroupId, mediaGroup);
+    const messages = await this.bot.api.sendMediaGroup(
+      this.mainGroupId,
+      mediaGroup,
+    );
+    return messages.map(({ message_id }) => message_id);
+  }
+
+  public async removePosts(postsId: number[]): Promise<void> {
+    try {
+      await this.bot.api.deleteMessages(this.mainGroupId, postsId);
+    } catch (_) {}
   }
 }

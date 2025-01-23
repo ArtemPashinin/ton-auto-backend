@@ -1,4 +1,4 @@
-import { Injectable, Query } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { AdvertisementModel } from './models/advertisement.model';
 import { AdvertisementDto } from './interfaces/dto/advertisement.dto';
@@ -17,6 +17,7 @@ import { QueryDto } from './interfaces/dto/query.dto';
 import { Op } from 'sequelize';
 import { SearchResultDto } from './interfaces/dto/search-result.dto';
 import { MediaOrderDto } from './interfaces/dto/media-order.dto';
+import { PostAdvertisementModel } from './models/post-advertisement.model';
 
 @Injectable()
 export class AdvertisementService {
@@ -27,6 +28,8 @@ export class AdvertisementService {
     private readonly advertisementModel: typeof AdvertisementModel,
     @InjectModel(FileModel)
     private readonly fileModel: typeof FileModel,
+    @InjectModel(PostAdvertisementModel)
+    private readonly postAdvertisementModel: typeof PostAdvertisementModel,
   ) {}
 
   public async finAll(query: QueryDto): Promise<SearchResultDto> {
@@ -284,6 +287,7 @@ export class AdvertisementService {
     return (
       await this.advertisementModel.findByPk(id, {
         include: [
+          { model: PostAdvertisementModel, as: 'posts', required: false },
           {
             model: UserModel,
             as: 'user',
@@ -420,7 +424,6 @@ export class AdvertisementService {
   }
 
   public async reorderMedia(orderData: MediaOrderDto[]): Promise<void> {
-    console.log(orderData);
     const transaction = await this.fileModel.sequelize.transaction();
 
     try {
@@ -438,5 +441,16 @@ export class AdvertisementService {
       await transaction.rollback();
       throw new Error('Failed to reorder media: ' + error.message);
     }
+  }
+
+  public async createPosts(
+    advertisementId: string,
+    postsId: number[],
+  ): Promise<void> {
+    const postsData = postsId.map((postId) => ({
+      post_id: postId,
+      advertisement_id: advertisementId,
+    }));
+    await this.postAdvertisementModel.bulkCreate(postsData);
   }
 }

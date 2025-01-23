@@ -16,6 +16,7 @@ import { MakeModel } from 'src/vehicle/models/make.model';
 import { CarModel } from 'src/vehicle/models/car-model.model';
 import { EngineModel } from 'src/vehicle/models/engine.model';
 import { ColorModel } from 'src/vehicle/models/color.model';
+import { PostAdvertisementModel } from './post-advertisement.model';
 
 @Table({
   tableName: 'advertisements',
@@ -114,4 +115,7 @@ export class AdvertisementModel extends Model<AdvertisementModel> {
 
   @BelongsToMany(() => UserModel, () => FavoriteModel)
   favoritedBy: UserModel[];
+
+  @HasMany(() => PostAdvertisementModel)
+  posts: PostAdvertisementModel[];
 }
