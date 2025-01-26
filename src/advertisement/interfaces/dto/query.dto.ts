@@ -15,4 +15,5 @@ export interface QueryDto {
   favorites?: boolean;
   commercial?: boolean;
   owned?: boolean;
+  type?: string;
 }

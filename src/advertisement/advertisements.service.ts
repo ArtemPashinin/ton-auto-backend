@@ -91,7 +91,10 @@ export class AdvertisementService {
           model: CarModel,
           as: 'model',
           required: true,
-          where: query.model ? { id: query.model } : {},
+          where: {
+            ...(query.model ? { id: query.model } : {}),
+            ...(query.type ? { type: query.type } : {}),
+          },
           include: [
             {
               model: MakeModel,
@@ -207,7 +210,10 @@ export class AdvertisementService {
           model: CarModel,
           as: 'model',
           required: true,
-          where: query.model ? { id: query.model } : {},
+          where: {
+            ...(query.model ? { id: query.model } : {}),
+            ...(query.type ? { type: query.type } : {}),
+          },
           include: [
             {
               model: MakeModel,

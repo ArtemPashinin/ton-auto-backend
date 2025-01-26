@@ -167,7 +167,8 @@ export class AdvertisementsController {
       await this.advertisementsService.findById(advertisementId);
     if (advertisement) {
       const file = advertisement.media.find((image) => image.id === fileId);
-      if (file) {
+      const { media } = advertisement;
+      if (file && media.length > 1) {
         await this.advertisementsService.deleteFile(fileId);
         await this.s3Service.deleteFile(file.image_url);
       }

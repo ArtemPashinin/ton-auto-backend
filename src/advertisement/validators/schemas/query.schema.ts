@@ -17,4 +17,5 @@ export const querySchema = Joi.object({
   favorites: Joi.boolean().optional().default(false),
   owned: Joi.boolean().default(false),
   commercial: Joi.boolean().optional(),
+  type: Joi.string().valid('car', 'motorcycle').optional(),
 });
