@@ -118,4 +118,7 @@ export class AdvertisementModel extends Model<AdvertisementModel> {
 
   @HasMany(() => PostAdvertisementModel)
   posts: PostAdvertisementModel[];
+
+  @Column({ type: DataType.CHAR(256) })
+  fict_phone: string;
 }
