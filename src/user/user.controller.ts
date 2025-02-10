@@ -35,7 +35,7 @@ export class UserController {
   @Get()
   public async findOne(
     @Query(new UserValidationPipe(findUserSchema)) userId: FindtUserDto,
-  ): Promise<UserModel> {
+  ) {
     return await this.userService.findOne(userId);
   }
 
@@ -65,14 +65,10 @@ export class UserController {
           favoriteAdvertisement.id === body.advertisementId,
       );
       if (!favoriteAdvertisement) {
-        try {
-          return await this.userService.createFavorite(
-            user.id,
-            body.advertisementId,
-          );
-        } catch (err) {
-          console.log(err);
-        }
+        return await this.userService.createFavorite(
+          user.id,
+          body.advertisementId,
+        );
       }
       await this.userService.removeFavorite(user.id, body.advertisementId);
     }

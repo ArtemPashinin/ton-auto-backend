@@ -61,10 +61,13 @@ export class UserService {
 
   public async createOne(userDto: UserDto): Promise<boolean> {
     const existsUser = await this.findOne({ tgId: userDto.user_id });
+
     if (!existsUser) {
       await this.userModel.create(userDto);
       return true;
     }
+
+    await existsUser.update(userDto);
     return false;
   }
 

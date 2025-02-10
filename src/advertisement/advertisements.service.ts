@@ -326,6 +326,11 @@ export class AdvertisementService {
             order: [['order', 'ASC']],
           },
           {
+            model: UserModel,
+            as: 'favoritedBy',
+            required: false,
+          },
+          {
             model: EngineModel,
             as: 'engine',
             required: true,
