@@ -60,7 +60,7 @@ export class AdvertisementsController {
     body: AdvertisementDto,
     @UploadedFiles(
       new ParseFilePipe({
-        validators: [new FileTypeValidator({ fileType: /^image\// })],
+        validators: [new FileTypeValidator({ fileType: /^(image|video)\// })],
         fileIsRequired: false,
       }),
     )
@@ -93,7 +93,7 @@ export class AdvertisementsController {
     @Body() body: any,
     @UploadedFile(
       new ParseFilePipe({
-        validators: [new FileTypeValidator({ fileType: /^image\// })],
+        validators: [new FileTypeValidator({ fileType: /^(image|video)\// })],
         fileIsRequired: true,
       }),
     )
