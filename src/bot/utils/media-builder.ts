@@ -28,10 +28,9 @@ export const mediaBuilder = (
       caption: index === 0 ? caption : '',
       parse_mode: 'HTML',
     };
-
     if (VIDEO_EXTENSIONS.includes(extension)) {
-      return InputMediaBuilder.video(new InputFile(image_url), commonOptions);
+      return InputMediaBuilder.video(image_url, commonOptions);
     }
 
-    return InputMediaBuilder.photo(new InputFile(image_url), commonOptions);
+    return InputMediaBuilder.photo(image_url, commonOptions);
   });

@@ -6,6 +6,7 @@ import {
 } from '@aws-sdk/client-s3';
 import { ConfigService } from '@nestjs/config';
 import { v4 as uuid4 } from 'uuid';
+import { getFileExtension } from 'src/bot/utils/get-file-extension';
 
 @Injectable()
 export class S3Service {
@@ -37,7 +38,8 @@ export class S3Service {
 
   public async uploadFile(file: Express.Multer.File): Promise<string> {
     const uuid = uuid4();
-    const key = `${this.filesPath}/${uuid}-${file.originalname}`
+    const extension = getFileExtension(file.originalname);
+    const key = `${this.filesPath}/${uuid}.${extension}`
       .replace(/\s+/g, '')
       .trim();
 
