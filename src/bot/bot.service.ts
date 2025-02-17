@@ -19,7 +19,10 @@ export class TelegramBot {
       'ERROR_LOG_CHAT_ID',
     );
     this.webAppInfo = { url: configService.get<string>('WEBAPP_URL') };
-    this.bot = new Bot(configService.get<string>('BOT_TOKEN'));
+    this.bot = new Bot(configService.get<string>('BOT_TOKEN'), {
+      client: { environment: 'test' },
+    });
+
     this.bot.catch((error) => {
       this.bot.api.sendMessage(this.errorLogChatId, JSON.stringify(error));
     });
@@ -54,7 +57,7 @@ export class TelegramBot {
   ): Promise<number[]> {
     const caption = createAdvertisementMessage(advertisement);
     const mediaGroup = mediaBuilder(advertisement.media, caption);
-    console.log(mediaGroup)
+    console.log(mediaGroup);
     const messages = await this.bot.api.sendMediaGroup(
       this.mainGroupId,
       mediaGroup,
