@@ -5,4 +5,5 @@ export interface UserDto {
   last_name?: string;
   phone?: string;
   language_code?: string;
+  free_publish?: boolean;
 }

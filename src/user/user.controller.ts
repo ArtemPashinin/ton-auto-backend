@@ -77,7 +77,7 @@ export class UserController {
   @Post()
   public async createOne(
     @Body(new UserValidationPipe(userSchema)) body: UserDto,
-  ): Promise<boolean> {
+  ): Promise<UserModel> {
     return await this.userService.createOne(body);
   }
 

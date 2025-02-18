@@ -10,8 +10,6 @@ import {
 } from 'sequelize-typescript';
 import { AdvertisementModel } from 'src/advertisement/models/advertisement.model';
 import { FavoriteModel } from './favorite.model';
-import { CountryModel } from './country.model';
-import { number } from 'joi';
 import { CityModel } from './city.model';
 
 @Table({
@@ -51,6 +49,9 @@ export class UserModel extends Model<UserModel> {
     allowNull: true,
   })
   phone: string;
+
+  @Column({ type: DataType.BOOLEAN, defaultValue: true })
+  free_publish: boolean;
 
   @ForeignKey(() => CityModel)
   @Column({ type: DataType.INTEGER, allowNull: true })

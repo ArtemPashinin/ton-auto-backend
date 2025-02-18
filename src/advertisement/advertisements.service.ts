@@ -18,12 +18,14 @@ import { Op } from 'sequelize';
 import { SearchResultDto } from './interfaces/dto/search-result.dto';
 import { MediaOrderDto } from './interfaces/dto/media-order.dto';
 import { PostAdvertisementModel } from './models/post-advertisement.model';
+import { UserService } from 'src/user/user.service';
 
 @Injectable()
 export class AdvertisementService {
   private readonly limit: number = 10;
 
   constructor(
+    private readonly userService: UserService,
     @InjectModel(AdvertisementModel)
     private readonly advertisementModel: typeof AdvertisementModel,
     @InjectModel(FileModel)
@@ -113,6 +115,7 @@ export class AdvertisementService {
         },
       ],
       where: {
+        paid: true,
         ...(query.commercial ? { commercial: query.commercial } : {}),
         ...(query.yearFrom && query.yearTo
           ? {
@@ -232,6 +235,7 @@ export class AdvertisementService {
         },
       ],
       where: {
+        paid: true,
         ...(query.commercial ? { commercial: query.commercial } : {}),
         ...(query.yearFrom && query.yearTo
           ? {
@@ -370,11 +374,23 @@ export class AdvertisementService {
   public async createOne(
     advertisement: AdvertisementDto,
   ): Promise<AdvertisementModel> {
-    const id = uuid();
-    return await this.advertisementModel.create({
-      id: id,
-      ...advertisement,
+    const user = await this.userService.findOneById(advertisement.user_id)
+    let paid = !user.free_publish;
+
+    if (user.free_publish) {
+      await this.userService.updateOne(
+        { id: advertisement.user_id },
+        { free_publish: false },
+      );
+    }
+  
+    const createdAdvertisement = await this.advertisementModel.create({
+      id: uuid(), // Генерируем уникальный идентификатор
+      paid: paid, // Устанавливаем статус оплаты
+      ...advertisement, // Остальные данные из DTO
     });
+  
+    return createdAdvertisement;
   }
 
   public async updateOneById(

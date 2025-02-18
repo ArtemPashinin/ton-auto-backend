@@ -96,6 +96,9 @@ export class AdvertisementModel extends Model<AdvertisementModel> {
   @Column({ type: DataType.BOOLEAN })
   commercial: boolean;
 
+  @Column({type: DataType.BOOLEAN})
+  paid: boolean;
+
   @ForeignKey(() => ConditionModel)
   @Column({ type: DataType.INTEGER, allowNull: true })
   condition_id: number;

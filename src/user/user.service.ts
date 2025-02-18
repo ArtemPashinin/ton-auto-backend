@@ -59,16 +59,44 @@ export class UserService {
     });
   }
 
-  public async createOne(userDto: UserDto): Promise<boolean> {
-    const existsUser = await this.findOne({ tgId: userDto.user_id });
+  public async createOne(userDto: UserDto): Promise<UserModel> {
+    const [user, created] = await this.userModel.findOrCreate({
+      where: { user_id: userDto.user_id }, // Условие поиска
+      defaults: userDto,
+      include: [
+        {
+          model: AdvertisementModel,
+          as: 'favoriteAdvertisements',
+          required: false,
+        },
+        {
+          model: CityModel,
+          as: 'city',
+          required: true,
+          include: [{ model: CountryModel, as: 'country', required: true }],
+        },
+      ],
+    });
 
-    if (!existsUser) {
-      await this.userModel.create(userDto);
-      return true;
+    if (!created) {
+      await user.update(userDto);
     }
 
-    await existsUser.update(userDto);
-    return false;
+    return await this.userModel.findByPk(user.id, {
+      include: [
+        {
+          model: AdvertisementModel,
+          as: 'favoriteAdvertisements',
+          required: false,
+        },
+        {
+          model: CityModel,
+          as: 'city',
+          required: true,
+          include: [{ model: CountryModel, as: 'country', required: true }],
+        },
+      ],
+    });
   }
 
   public async findAllCountries(): Promise<CountryModel[]> {

@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { SequelizeModule } from '@nestjs/sequelize';
 import { UserModel } from './models/user.model';
 import { UserService } from './user.service';
@@ -11,7 +11,7 @@ import { CityModel } from './models/city.model';
 
 @Module({
   imports: [
-    AdvertisementsModule,
+    forwardRef(() => AdvertisementsModule),
     SequelizeModule.forFeature([
       UserModel,
       FavoriteModel,

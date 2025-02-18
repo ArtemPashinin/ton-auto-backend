@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { AdvertisementService } from './advertisements.service';
 import { SequelizeModule } from '@nestjs/sequelize';
 import { AdvertisementModel } from './models/advertisement.model';
@@ -10,6 +10,7 @@ import { FavoriteModel } from 'src/user/models/favorite.model';
 import { ConditionModel } from '../vehicle/models/condition.model';
 import { BotModule } from 'src/bot/bot.module';
 import { PostAdvertisementModel } from './models/post-advertisement.model';
+import { UserModule } from 'src/user/user.module';
 
 @Module({
   imports: [
@@ -23,6 +24,7 @@ import { PostAdvertisementModel } from './models/post-advertisement.model';
       ConditionModel,
     ]),
     S3Module,
+    forwardRef(() => UserModule)
   ],
   controllers: [AdvertisementsController],
   providers: [AdvertisementService],
