@@ -12,6 +12,7 @@ export class TelegramBot {
   private mainGroupId: string | number;
   private errorLogChatId: string | number;
   private webAppInfo: WebAppInfo;
+  private errorLogging = false;
 
   constructor(private readonly configService: ConfigService) {
     this.mainGroupId = configService.get<number | string>('MAIN_GROUP');
@@ -24,7 +25,13 @@ export class TelegramBot {
     });
 
     this.bot.catch((error) => {
-      this.bot.api.sendMessage(this.errorLogChatId, JSON.stringify(error));
+      if (!this.errorLogging) {
+        this.bot.api.sendMessage(this.errorLogChatId, JSON.stringify(error));
+        this.errorLogging = true;
+      }
+      setTimeout(() => {
+        this.errorLogging = false;
+      }, 5000);
     });
   }
 
