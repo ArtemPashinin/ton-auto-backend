@@ -44,6 +44,19 @@ export class TelegramBot {
     return this.webAppInfo;
   }
 
+  public async createInvoiceLink(
+    payload: Record<string, string | number>,
+  ): Promise<string> {
+    return await this.bot.api.createInvoiceLink(
+      'Publish advertisement',
+      'stars payment',
+      JSON.stringify(payload),
+      'provider_token',
+      'XTR',
+      [{ amount: 500, label: 'Publish advertisement' }],
+    );
+  }
+
   public async sendMessageToUser(userId: number, text: string): Promise<void> {
     await this.bot.api.sendMessage(userId, text);
   }

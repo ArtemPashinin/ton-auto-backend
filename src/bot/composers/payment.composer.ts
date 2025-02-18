@@ -31,7 +31,8 @@ export class PaymentComposer implements OnModuleInit {
     if (!ctx.message || !ctx.message.successful_payment || !ctx.from) return;
 
     const paymentInfo = ctx.message.successful_payment;
-    console.log(JSON.parse(paymentInfo.invoice_payload));
+    console.log(ctx.from);
+    console.log(paymentInfo);
     const { id: userId } = ctx.from;
     await ctx.reply(JSON.stringify(paymentInfo)).catch((err) => {
       console.log(err);

@@ -16,7 +16,11 @@ export class UserComposer implements OnModuleInit {
       this.telegramBot.getWebAppInfo(),
     );
     this.registerHandlers();
-    this.telegramBot.getBot().chatType(ChatType.PRIVATE).use(this.composer);
+    this.telegramBot
+      .getBot()
+      .chatType(ChatType.PRIVATE)
+      .filter((ctx) => !ctx.from.is_bot)
+      .use(this.composer);
   }
 
   private registerHandlers(): void {

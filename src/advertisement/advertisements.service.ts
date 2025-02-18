@@ -115,7 +115,7 @@ export class AdvertisementService {
         },
       ],
       where: {
-        paid: true,
+        paid: query.owned ? { [Op.or]: [true, false] } : true,
         ...(query.commercial ? { commercial: query.commercial } : {}),
         ...(query.yearFrom && query.yearTo
           ? {
@@ -235,7 +235,8 @@ export class AdvertisementService {
         },
       ],
       where: {
-        paid: true,
+        paid: query.owned === true ? { [Op.or]: [true, false] } : true,
+
         ...(query.commercial ? { commercial: query.commercial } : {}),
         ...(query.yearFrom && query.yearTo
           ? {
@@ -374,8 +375,8 @@ export class AdvertisementService {
   public async createOne(
     advertisement: AdvertisementDto,
   ): Promise<AdvertisementModel> {
-    const user = await this.userService.findOneById(advertisement.user_id)
-    let paid = !user.free_publish;
+    const user = await this.userService.findOneById(advertisement.user_id);
+    let paid = user.free_publish;
 
     if (user.free_publish) {
       await this.userService.updateOne(
@@ -383,13 +384,13 @@ export class AdvertisementService {
         { free_publish: false },
       );
     }
-  
+
     const createdAdvertisement = await this.advertisementModel.create({
       id: uuid(), // Генерируем уникальный идентификатор
       paid: paid, // Устанавливаем статус оплаты
       ...advertisement, // Остальные данные из DTO
     });
-  
+
     return createdAdvertisement;
   }
 

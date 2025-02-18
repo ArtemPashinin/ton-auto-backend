@@ -32,7 +32,6 @@ import { TelegramBot } from 'src/bot/bot.service';
 
 @Controller('advertisements')
 export class AdvertisementsController {
-  sequelize: any;
   constructor(
     private readonly advertisementsService: AdvertisementService,
     private readonly s3Service: S3Service,
