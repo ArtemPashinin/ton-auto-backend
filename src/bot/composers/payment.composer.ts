@@ -1,13 +1,16 @@
 import { Injectable, OnModuleInit } from '@nestjs/common';
 import { Composer, Context } from 'grammy';
 import { TelegramBot } from '../bot.service';
-import { ChatType } from '../enums/chat-types.enum';
+import { AdvertisementService } from 'src/advertisement/advertisements.service';
 
 @Injectable()
 export class PaymentComposer implements OnModuleInit {
   private readonly composer = new Composer<Context>();
 
-  constructor(private readonly telegramBot: TelegramBot) {}
+  constructor(
+    private readonly telegramBot: TelegramBot,
+    private readonly advertisementsService: AdvertisementService,
+  ) {}
 
   async onModuleInit() {
     this.registerHandlers();
@@ -27,12 +30,18 @@ export class PaymentComposer implements OnModuleInit {
     });
   }
 
-  private async successfulPayment(ctx: Context) {
+  private async successfulPayment(ctx: Context): Promise<void> {
     if (!ctx.message || !ctx.message.successful_payment || !ctx.from) return;
 
-    const paymentInfo = ctx.message.successful_payment;
-    await ctx.reply(JSON.stringify(paymentInfo)).catch((err) => {
-      console.log(err);
-    });
+    const { advertisement_id: id } = JSON.parse(
+      ctx.message.successful_payment.invoice_payload,
+    );
+
+    const advertisement = await this.advertisementsService.setPaid(id);
+    if (advertisement && advertisement.paid) {
+      const postsId =
+        await this.telegramBot.sendAdvertisementToGroup(advertisement);
+      await this.advertisementsService.createPosts(id, postsId);
+    }
   }
 }

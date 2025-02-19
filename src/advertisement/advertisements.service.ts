@@ -376,7 +376,7 @@ export class AdvertisementService {
     advertisement: AdvertisementDto,
   ): Promise<AdvertisementModel> {
     const user = await this.userService.findOneById(advertisement.user_id);
-    let paid = user.free_publish;
+    let paid = user.admin ? true : user.free_publish;
 
     if (user.free_publish) {
       await this.userService.updateOne(
@@ -401,6 +401,16 @@ export class AdvertisementService {
     await this.advertisementModel.update(advertisement, {
       where: { id: advertisementId },
     });
+    return await this.findById(advertisementId);
+  }
+
+  public async setPaid(advertisementId: string): Promise<AdvertisementModel> {
+    await this.advertisementModel.update(
+      { paid: true },
+      {
+        where: { id: advertisementId },
+      },
+    );
     return await this.findById(advertisementId);
   }
 

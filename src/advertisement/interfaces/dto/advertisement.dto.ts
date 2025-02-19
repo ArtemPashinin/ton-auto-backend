@@ -11,5 +11,7 @@ export interface AdvertisementDto {
   color_id: number;
   price: number;
   description: string;
+  paid: boolean;
+  fict_phone?: string;
   meta: MetaDto[];
 }

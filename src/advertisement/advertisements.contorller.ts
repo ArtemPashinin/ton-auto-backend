@@ -77,9 +77,11 @@ export class AdvertisementsController {
     });
     await this.advertisementsService.addFiles(mediaData, id);
     const advertisement = await this.advertisementsService.findById(id);
-    const postsId =
-      await this.telegramBot.sendAdvertisementToGroup(advertisement);
-    await this.advertisementsService.createPosts(id, postsId);
+    if (advertisement.paid) {
+      const postsId =
+        await this.telegramBot.sendAdvertisementToGroup(advertisement);
+      await this.advertisementsService.createPosts(id, postsId);
+    }
     return advertisement;
   }
 

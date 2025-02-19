@@ -23,6 +23,9 @@ export class UserModel extends Model<UserModel> {
   })
   id: number;
 
+  @Column({type: DataType.BOOLEAN, defaultValue: false})
+  admin: boolean
+
   @Column({
     type: DataType.INTEGER,
     allowNull: false,
