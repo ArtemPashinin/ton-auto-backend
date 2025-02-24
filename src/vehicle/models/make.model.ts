@@ -1,4 +1,6 @@
-import { Column, DataType, Table, Model } from 'sequelize-typescript';
+import { Table, Column, Model, DataType, HasMany } from 'sequelize-typescript';
+import { CarModel } from './car-model.model';
+
 
 @Table({ tableName: 'makes', timestamps: false })
 export class MakeModel extends Model<MakeModel> {
@@ -7,4 +9,7 @@ export class MakeModel extends Model<MakeModel> {
 
   @Column({ type: DataType.CHAR(256) })
   make: string;
+
+  @HasMany(() => CarModel)
+  models: CarModel[];
 }

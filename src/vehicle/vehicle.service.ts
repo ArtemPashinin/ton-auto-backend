@@ -5,6 +5,7 @@ import { CarModel } from './models/car-model.model';
 import { EngineModel } from './models/engine.model';
 import { ColorModel } from './models/color.model';
 import { ConditionModel } from './models/condition.model';
+import { AdvertisementModel } from 'src/advertisement/models/advertisement.model';
 
 @Injectable()
 export class VehicleService {
@@ -19,6 +20,29 @@ export class VehicleService {
 
   public async getMakes(): Promise<MakeModel[]> {
     return await this.makeModel.findAll();
+  }
+
+  public async getExistsMakes(): Promise<MakeModel[]> {
+    const makes = await MakeModel.findAll({
+      attributes: ['id', 'make'],
+      include: [
+        {
+          attributes: [],
+          model: CarModel,
+          include: [
+            {
+              attributes: [],
+              model: AdvertisementModel,
+              where: {},
+              required: true,
+            },
+          ],
+          required: true,
+        },
+      ],
+    });
+
+    return makes;
   }
 
   public async getModelsByMake(id: number): Promise<CarModel[]> {

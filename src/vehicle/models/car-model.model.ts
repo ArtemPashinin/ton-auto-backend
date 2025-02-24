@@ -3,10 +3,12 @@ import {
   Column,
   DataType,
   ForeignKey,
+  HasMany,
   Model,
   Table,
 } from 'sequelize-typescript';
 import { MakeModel } from './make.model';
+import { AdvertisementModel } from 'src/advertisement/models/advertisement.model';
 
 @Table({ tableName: 'models', timestamps: false })
 export class CarModel extends Model<CarModel> {
@@ -19,6 +21,9 @@ export class CarModel extends Model<CarModel> {
     allowNull: false,
   })
   make_id: number;
+
+  @HasMany(() => AdvertisementModel)
+  models: AdvertisementModel[];
 
   @BelongsTo(() => MakeModel)
   make: MakeModel;

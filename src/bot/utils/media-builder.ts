@@ -23,7 +23,7 @@ export const mediaBuilder = (
 ): (InputMediaPhoto | InputMediaVideo)[] =>
   files.map(({ image_url }, index) => {
     const extension = getFileExtension(image_url);
-
+    
     const commonOptions: { caption: string; parse_mode: ParseMode } = {
       caption: index === 0 ? caption : '',
       parse_mode: 'HTML',

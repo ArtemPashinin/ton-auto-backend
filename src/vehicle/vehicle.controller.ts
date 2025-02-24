@@ -15,6 +15,11 @@ export class VehicleController {
     return await this.vehicleService.getMakes();
   }
 
+  @Get('existsMakes')
+  public async getExistsMakes(): Promise<MakeModel[]> {
+    return await this.vehicleService.getExistsMakes();
+  }
+
   @Get('models/:id')
   public async getModels(
     @Param('id', ParseIntPipe) id: number,
