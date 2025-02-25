@@ -19,6 +19,7 @@ import { SearchResultDto } from './interfaces/dto/search-result.dto';
 import { MediaOrderDto } from './interfaces/dto/media-order.dto';
 import { PostAdvertisementModel } from './models/post-advertisement.model';
 import { UserService } from 'src/user/user.service';
+import { FavoriteModel } from 'src/user/models/favorite.model';
 
 @Injectable()
 export class AdvertisementService {
@@ -287,7 +288,16 @@ export class AdvertisementService {
           'condition_id',
         ],
       },
-      order: [['createdAt', 'DESC']],
+      order: query.favorites
+        ? [
+            [
+              { model: UserModel, as: 'favoritedBy' },
+              FavoriteModel,
+              'createdAt',
+              'DESC',
+            ],
+          ] // Сортировка по дате в промежуточной таблице
+        : [['createdAt', 'DESC']],
       limit: this.limit,
       offset: this.limit * (query.page - 1),
     });

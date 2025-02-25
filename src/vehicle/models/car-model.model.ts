@@ -23,7 +23,7 @@ export class CarModel extends Model<CarModel> {
   make_id: number;
 
   @HasMany(() => AdvertisementModel)
-  models: AdvertisementModel[];
+  advertisements: AdvertisementModel[];
 
   @BelongsTo(() => MakeModel)
   make: MakeModel;

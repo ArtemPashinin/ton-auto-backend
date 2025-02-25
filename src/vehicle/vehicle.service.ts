@@ -24,7 +24,6 @@ export class VehicleService {
 
   public async getExistsMakes(): Promise<MakeModel[]> {
     const makes = await MakeModel.findAll({
-      attributes: ['id', 'make'],
       include: [
         {
           attributes: [],
@@ -40,9 +39,29 @@ export class VehicleService {
           required: true,
         },
       ],
+      group: ['MakeModel.id'],
     });
-
     return makes;
+  }
+
+  public async getExistsModelsByMake(id: number): Promise<CarModel[]> {
+    const models = await CarModel.findAll({
+      attributes: ['id', 'model'],
+      include: [
+        {
+          attributes: [],
+          model: AdvertisementModel,
+          where: {}, 
+          required: true, 
+        },
+      ],
+      where: {
+        make_id: id,
+      },
+      group: ['CarModel.id'],
+    });
+  
+    return models;
   }
 
   public async getModelsByMake(id: number): Promise<CarModel[]> {

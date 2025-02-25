@@ -8,7 +8,7 @@ import {
 import { AdvertisementModel } from 'src/advertisement/models/advertisement.model';
 import { UserModel } from './user.model';
 
-@Table({ tableName: 'favorites', timestamps: false })
+@Table({ tableName: 'favorites', timestamps: true })
 export class FavoriteModel extends Model<FavoriteModel> {
   @ForeignKey(() => UserModel)
   @Column
