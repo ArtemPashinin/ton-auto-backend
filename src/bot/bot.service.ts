@@ -20,9 +20,7 @@ export class TelegramBot {
       'ERROR_LOG_CHAT_ID',
     );
     this.webAppInfo = { url: configService.get<string>('WEBAPP_URL') };
-    this.bot = new Bot(configService.get<string>('BOT_TOKEN'), {
-      client: { environment: 'test' },
-    });
+    this.bot = new Bot(configService.get<string>('BOT_TOKEN'), {});
 
     this.bot.catch((error) => {
       if (!this.errorLogging) {
