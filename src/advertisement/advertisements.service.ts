@@ -305,78 +305,76 @@ export class AdvertisementService {
   }
 
   public async findById(id: string): Promise<AdvertisementModel> {
-    return (
-      await this.advertisementModel.findByPk(id, {
-        include: [
-          { model: PostAdvertisementModel, as: 'posts', required: false },
-          {
-            model: UserModel,
-            as: 'user',
-            required: true,
+    return await this.advertisementModel.findByPk(id, {
+      include: [
+        { model: PostAdvertisementModel, as: 'posts', required: false },
+        {
+          model: UserModel,
+          as: 'user',
+          required: true,
 
-            include: [
-              {
-                model: CityModel,
-                as: 'city',
-                required: true,
+          include: [
+            {
+              model: CityModel,
+              as: 'city',
+              required: true,
 
-                include: [
-                  {
-                    model: CountryModel,
-                    as: 'country',
-                    required: true,
-                  },
-                ],
-                attributes: { exclude: ['country_id'] },
-              },
-            ],
-            attributes: {
-              exclude: ['city_id'],
+              include: [
+                {
+                  model: CountryModel,
+                  as: 'country',
+                  required: true,
+                },
+              ],
+              attributes: { exclude: ['country_id'] },
             },
+          ],
+          attributes: {
+            exclude: ['city_id'],
           },
-          {
-            model: FileModel,
-            as: 'media',
-            required: true,
-            order: [['order', 'ASC']],
-          },
-          {
-            model: UserModel,
-            as: 'favoritedBy',
-            required: false,
-          },
-          {
-            model: EngineModel,
-            as: 'engine',
-            required: true,
-          },
-          {
-            model: ColorModel,
-            as: 'color',
-            required: true,
-          },
-          {
-            model: CarModel,
-            as: 'model',
-            required: true,
-            include: [
-              {
-                model: MakeModel,
-                as: 'make',
-                required: true,
-              },
-            ],
-            attributes: { exclude: ['make_id'] },
-          },
-          { model: FavoriteModel, as: 'favoriteBy', required: false },
-          {
-            model: ConditionModel,
-            as: 'condition',
-            required: true,
-          },
-        ],
-      })
-    ).get({ plain: true });
+        },
+        {
+          model: FileModel,
+          as: 'media',
+          required: true,
+          order: [['order', 'ASC']],
+        },
+        {
+          model: UserModel,
+          as: 'favoritedBy',
+          required: false,
+        },
+        {
+          model: EngineModel,
+          as: 'engine',
+          required: true,
+        },
+        {
+          model: ColorModel,
+          as: 'color',
+          required: true,
+        },
+        {
+          model: CarModel,
+          as: 'model',
+          required: true,
+          include: [
+            {
+              model: MakeModel,
+              as: 'make',
+              required: true,
+            },
+          ],
+          attributes: { exclude: ['make_id'] },
+        },
+
+        {
+          model: ConditionModel,
+          as: 'condition',
+          required: true,
+        },
+      ],
+    });
   }
 
   public async deleteById(advertisementId: string): Promise<void> {
