@@ -368,6 +368,7 @@ export class AdvertisementService {
             ],
             attributes: { exclude: ['make_id'] },
           },
+          { model: FavoriteModel, as: 'favoriteBy', required: false },
           {
             model: ConditionModel,
             as: 'condition',
