@@ -51,8 +51,8 @@ export class VehicleService {
         {
           attributes: [],
           model: AdvertisementModel,
-          where: {}, 
-          required: true, 
+          where: {},
+          required: true,
         },
       ],
       where: {
@@ -60,7 +60,7 @@ export class VehicleService {
       },
       group: ['CarModel.id'],
     });
-  
+
     return models;
   }
 
@@ -68,6 +68,20 @@ export class VehicleService {
     return await this.carModel.findAll({
       include: [
         { model: MakeModel, as: 'make', required: true, where: { id: id } },
+      ],
+    });
+  }
+
+  public async findMakeByModelId(id: number): Promise<MakeModel> {
+    return await this.makeModel.findOne({
+      include: [
+        {
+          attributes: [],
+          model: CarModel,
+          as: 'models',
+          required: true,
+          where: { id: id },
+        },
       ],
     });
   }

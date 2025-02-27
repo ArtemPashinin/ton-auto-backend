@@ -32,6 +32,11 @@ export class VehicleController {
     return await this.vehicleService.getModelsByMake(id);
   }
 
+  @Get('makes/:id')
+  public async findMakeByModelId(@Param('id', ParseIntPipe) id: number): Promise<MakeModel>{
+    return await this.vehicleService.findMakeByModelId(id)
+  }
+
   @Get('engineTypes')
   public async getEngineTypes(): Promise<EngineModel[]> {
     return await this.vehicleService.getEngineTypes();
