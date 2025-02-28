@@ -3,12 +3,20 @@ import { AppModule } from './app.module';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  app.enableCors({
-    // origin: ['*'],
-    methods: 'GET,POST,PUT,DELETE',
-    allowedHeaders: 'Content-Type, Authorization',
-    credentials: true,
-  });
+  const environment = process.env.BOT_ENVIRONMENT;
+
+  // Условие для настройки CORS
+  if (environment === 'prod') {
+    app.enableCors({
+      origin: ['*'],
+      methods: 'GET,POST,PUT,DELETE',
+      allowedHeaders: 'Content-Type, Authorization',
+      credentials: true,
+    });
+  } else {
+    app.enableCors(); // Для других сред (например, разработки) включаем все по умолчанию
+  }
+
   await app.listen(process.env.PORT || 3000);
 }
 bootstrap();
