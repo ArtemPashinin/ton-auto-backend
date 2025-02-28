@@ -9,7 +9,7 @@ async function bootstrap() {
   if (environment === 'prod') {
     console.log('this');
     app.enableCors({
-      origin: 'https://vuzcrmplus.store',
+      origin: 'https://tonauto.app',
       methods: 'GET,POST,PUT,DELETE',
       allowedHeaders: 'Content-Type, Authorization',
       credentials: true,
