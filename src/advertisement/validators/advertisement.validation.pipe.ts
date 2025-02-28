@@ -12,6 +12,7 @@ export class AdvertisementValidationPipe implements PipeTransform {
     const { error } = this.schema.validate(value, {
       abortEarly: false,
     });
+    console.error(value);
     if (error) {
       throw new HttpException(error.details[0].message, HttpStatus.BAD_REQUEST);
     }
