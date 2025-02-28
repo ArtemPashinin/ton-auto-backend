@@ -556,10 +556,11 @@ export class AdvertisementService {
     ];
 
     // Итоговое количество: только объявления для обычных пользователей
+    const totalCount = count + fromAdminCount;
 
     return {
       advertisements: allAdvertisements,
-      count: allAdvertisements.length,
+      count: totalCount,
     };
   }
 
