@@ -35,7 +35,7 @@ export class AdvertisementService {
     private readonly postAdvertisementModel: typeof PostAdvertisementModel,
   ) {}
 
-  public async finAll(query: QueryDto): Promise<SearchResultDto> {
+  public async findAll(query: QueryDto): Promise<SearchResultDto> {
     const count = await this.advertisementModel.count({
       distinct: true,
       col: 'id',
@@ -65,6 +65,118 @@ export class AdvertisementService {
           attributes: {
             exclude: ['city_id'],
           },
+        },
+        {
+          model: FileModel,
+          as: 'media',
+          required: false,
+          order: ['order', 'ASC'],
+        },
+        {
+          model: UserModel,
+          as: 'favoritedBy',
+          required: query.favorites,
+          where: query.userId ? { id: query.userId } : {},
+        },
+        {
+          model: EngineModel,
+          as: 'engine',
+          required: true,
+          where: query.engine ? { id: query.engine } : {},
+        },
+        {
+          model: ColorModel,
+          as: 'color',
+          required: true,
+          where: query.color ? { id: query.color } : {},
+        },
+        {
+          model: CarModel,
+          as: 'model',
+          required: true,
+          where: {
+            ...(query.model ? { id: query.model } : {}),
+            ...(query.type ? { type: query.type } : {}),
+          },
+          include: [
+            {
+              model: MakeModel,
+              as: 'make',
+              required: true,
+              where: query.make ? { id: query.make } : {},
+            },
+          ],
+          attributes: { exclude: ['make_id'] },
+        },
+        {
+          model: ConditionModel,
+          as: 'condition',
+          required: true,
+          where: query.condition ? { id: query.condition } : {},
+        },
+      ],
+      where: {
+        fict_country_id: null, // Исключаем объявления с fict_country
+        fict_city_id: null,
+        paid: query.owned ? { [Op.or]: [true, false] } : true,
+        ...(query.commercial ? { commercial: query.commercial } : {}),
+        ...(query.yearFrom && query.yearTo
+          ? {
+              year: {
+                [Op.between]: [query.yearFrom, query.yearTo],
+              },
+            }
+          : query.yearFrom
+            ? {
+                year: {
+                  [Op.gte]: query.yearFrom,
+                },
+              }
+            : query.yearTo
+              ? {
+                  year: {
+                    [Op.lte]: query.yearTo,
+                  },
+                }
+              : {}),
+        ...(query.mileageFrom && query.mileageTo
+          ? {
+              mileage: {
+                [Op.between]: [query.mileageFrom, query.mileageTo],
+              },
+            }
+          : query.mileageFrom
+            ? {
+                mileage: {
+                  [Op.gte]: query.mileageFrom,
+                },
+              }
+            : query.mileageTo
+              ? {
+                  mileage: {
+                    [Op.lte]: query.mileageTo,
+                  },
+                }
+              : {}),
+      },
+    });
+
+    const fromAdminCount = await this.advertisementModel.count({
+      distinct: true,
+      col: 'id',
+      include: [
+        {
+          model: CityModel,
+          as: 'fict_city',
+          required: true,
+          where: query.city ? { id: query.city } : {},
+          attributes: { exclude: ['country_id'] },
+        },
+        {
+          model: CountryModel,
+          as: 'fict_country',
+          required: true,
+          where: query.country ? { id: query.country } : {},
         },
         {
           model: FileModel,
@@ -158,6 +270,7 @@ export class AdvertisementService {
               : {}),
       },
     });
+
     const advertisements = await this.advertisementModel.findAll({
       include: [
         {
@@ -185,6 +298,139 @@ export class AdvertisementService {
           attributes: {
             exclude: ['city_id'],
           },
+        },
+        {
+          model: FileModel,
+          as: 'media',
+          required: true,
+          order: [['order', 'ASC']],
+        },
+        {
+          model: UserModel,
+          as: 'favoritedBy',
+          required: query.favorites,
+          where: query.userId ? { id: query.userId } : {},
+        },
+        {
+          model: EngineModel,
+          as: 'engine',
+          required: true,
+          where: query.engine ? { id: query.engine } : {},
+        },
+        {
+          model: ColorModel,
+          as: 'color',
+          required: true,
+          where: query.color ? { id: query.color } : {},
+        },
+        {
+          model: CarModel,
+          as: 'model',
+          required: true,
+          where: {
+            ...(query.model ? { id: query.model } : {}),
+            ...(query.type ? { type: query.type } : {}),
+          },
+          include: [
+            {
+              model: MakeModel,
+              as: 'make',
+              required: true,
+              where: query.make ? { id: query.make } : {},
+            },
+          ],
+          attributes: { exclude: ['make_id'] },
+        },
+        {
+          model: ConditionModel,
+          as: 'condition',
+          required: true,
+          where: query.condition ? { id: query.condition } : {},
+        },
+      ],
+      where: {
+        fict_country_id: null, // Исключаем объявления с fict_country
+        fict_city_id: null,
+        paid: query.owned === true ? { [Op.or]: [true, false] } : true,
+
+        ...(query.commercial ? { commercial: query.commercial } : {}),
+        ...(query.yearFrom && query.yearTo
+          ? {
+              year: {
+                [Op.between]: [query.yearFrom, query.yearTo],
+              },
+            }
+          : query.yearFrom
+            ? {
+                year: {
+                  [Op.gte]: query.yearFrom,
+                },
+              }
+            : query.yearTo
+              ? {
+                  year: {
+                    [Op.lte]: query.yearTo,
+                  },
+                }
+              : {}),
+        ...(query.mileageFrom && query.mileageTo
+          ? {
+              mileage: {
+                [Op.between]: [query.mileageFrom, query.mileageTo],
+              },
+            }
+          : query.mileageFrom
+            ? {
+                mileage: {
+                  [Op.gte]: query.mileageFrom,
+                },
+              }
+            : query.mileageTo
+              ? {
+                  mileage: {
+                    [Op.lte]: query.mileageTo,
+                  },
+                }
+              : {}),
+      },
+      attributes: {
+        exclude: [
+          'user_id',
+          'engine_id',
+          'color_id',
+          'make_id',
+          'model_id',
+          'condition_id',
+        ],
+      },
+      order: query.favorites
+        ? [
+            [
+              { model: UserModel, as: 'favoritedBy' },
+              FavoriteModel,
+              'createdAt',
+              'DESC',
+            ],
+          ] // Сортировка по дате в промежуточной таблице
+        : [['createdAt', 'DESC']],
+      limit: this.limit,
+      offset: this.limit * (query.page - 1),
+    });
+
+    const fromAdminAdvertisements = await this.advertisementModel.findAll({
+      include: [
+        {
+          model: CityModel,
+          as: 'fict_city',
+          required: true,
+          where: query.city ? { id: query.city } : {},
+          attributes: { exclude: ['country_id'] },
+        },
+        {
+          model: CountryModel,
+          as: 'fict_country',
+          required: true,
+          where: query.country ? { id: query.country } : {},
         },
         {
           model: FileModel,
@@ -301,13 +547,38 @@ export class AdvertisementService {
       limit: this.limit,
       offset: this.limit * (query.page - 1),
     });
-    return { advertisements: advertisements, count: count };
+    const allAdvertisements = [
+      ...advertisements.filter(
+        (ad) =>
+          !fromAdminAdvertisements.some((adminAd) => adminAd.id === ad.id),
+      ),
+      ...fromAdminAdvertisements,
+    ];
+
+    // Итоговое количество: только объявления для обычных пользователей
+
+    return {
+      advertisements: allAdvertisements,
+      count: allAdvertisements.length,
+    };
   }
 
   public async findById(id: string): Promise<AdvertisementModel> {
     return (
       await this.advertisementModel.findByPk(id, {
         include: [
+          {
+            model: CityModel,
+            as: 'fict_city',
+            required: false,
+
+            attributes: { exclude: ['country_id'] },
+          },
+          {
+            model: CountryModel,
+            as: 'fict_country',
+            required: false,
+          },
           { model: PostAdvertisementModel, as: 'posts', required: false },
           {
             model: UserModel,

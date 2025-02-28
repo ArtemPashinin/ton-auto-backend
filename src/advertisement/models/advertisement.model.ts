@@ -17,6 +17,8 @@ import { CarModel } from 'src/vehicle/models/car-model.model';
 import { EngineModel } from 'src/vehicle/models/engine.model';
 import { ColorModel } from 'src/vehicle/models/color.model';
 import { PostAdvertisementModel } from './post-advertisement.model';
+import { CountryModel } from 'src/user/models/country.model';
+import { CityModel } from 'src/user/models/city.model';
 
 @Table({
   tableName: 'advertisements',
@@ -96,7 +98,7 @@ export class AdvertisementModel extends Model<AdvertisementModel> {
   @Column({ type: DataType.BOOLEAN })
   commercial: boolean;
 
-  @Column({type: DataType.BOOLEAN})
+  @Column({ type: DataType.BOOLEAN })
   paid: boolean;
 
   @ForeignKey(() => ConditionModel)
@@ -124,4 +126,18 @@ export class AdvertisementModel extends Model<AdvertisementModel> {
 
   @Column({ type: DataType.CHAR(256) })
   fict_phone: string;
+
+  @ForeignKey(() => CountryModel)
+  @Column({ type: DataType.INTEGER, allowNull: true })
+  fict_country_id: number;
+
+  @BelongsTo(() => CountryModel)
+  fict_country: CountryModel;
+
+  @ForeignKey(() => CityModel)
+  @Column({ type: DataType.INTEGER, allowNull: true })
+  fict_city_id: number;
+
+  @BelongsTo(() => CityModel)
+  fict_city: CityModel;
 }

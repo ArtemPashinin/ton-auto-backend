@@ -13,6 +13,8 @@ export class TelegramBot {
   private errorLogChatId: string | number;
   private webAppInfo: WebAppInfo;
   private errorLogging = false;
+  private errorLogTimeout = 5000;
+  private placePrice: number;
 
   constructor(private readonly configService: ConfigService) {
     this.mainGroupId = configService.get<number | string>('MAIN_GROUP');
@@ -20,7 +22,13 @@ export class TelegramBot {
       'ERROR_LOG_CHAT_ID',
     );
     this.webAppInfo = { url: configService.get<string>('WEBAPP_URL') };
-    this.bot = new Bot(configService.get<string>('BOT_TOKEN'));
+    this.placePrice = configService.get<number>('PLACE_PRICE');
+    this.bot = new Bot(configService.get<string>('BOT_TOKEN'), {
+      client: {
+        environment:
+          configService.get<'test' | 'prod'>('BOT_ENVIRONMENT') || 'prod',
+      },
+    });
 
     this.bot.catch((error) => {
       if (!this.errorLogging) {
@@ -29,7 +37,7 @@ export class TelegramBot {
       }
       setTimeout(() => {
         this.errorLogging = false;
-      }, 5000);
+      }, this.errorLogTimeout);
     });
   }
 
@@ -58,7 +66,7 @@ export class TelegramBot {
       JSON.stringify(payload),
       'provider_token',
       'XTR',
-      [{ amount: 500, label: 'Publish advertisement' }],
+      [{ amount: this.placePrice, label: 'Publish advertisement' }],
     );
   }
 

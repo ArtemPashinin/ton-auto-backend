@@ -42,7 +42,7 @@ export class AdvertisementsController {
   public async findAll(
     @Query(new QueryValidationPipe(querySchema)) query: QueryDto,
   ): Promise<SearchResultDto> {
-    return await this.advertisementsService.finAll(query);
+    return await this.advertisementsService.findAll(query);
   }
 
   @Get(':id')
