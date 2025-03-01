@@ -79,10 +79,13 @@ export class AdvertisementsController {
     const advertisement = await this.advertisementsService.findById(id);
 
     if (advertisement.paid && advertisement) {
-      console.log('this');
-      const postsId =
-        await this.telegramBot.sendAdvertisementToGroup(advertisement);
-      await this.advertisementsService.createPosts(id, postsId);
+      try {
+        const postsId =
+          await this.telegramBot.sendAdvertisementToGroup(advertisement);
+        await this.advertisementsService.createPosts(id, postsId);
+      } catch (err) {
+        console.error(err);
+      }
     }
     return advertisement;
   }
