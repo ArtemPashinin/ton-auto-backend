@@ -65,7 +65,6 @@ export class AdvertisementsController {
     )
     files: Express.Multer.File[],
   ): Promise<AdvertisementModel> {
-    console.error(body);
     const { id } = await this.advertisementsService.createOne(body);
     const imageUrls = await this.s3Service.uploadMultipleFiles(files);
     const mediaData = [] as MediaDto[];
@@ -78,7 +77,7 @@ export class AdvertisementsController {
     });
     await this.advertisementsService.addFiles(mediaData, id);
     const advertisement = await this.advertisementsService.findById(id);
-
+    console.error('ad:', advertisement);
     if (advertisement.paid && advertisement) {
       const postsId =
         await this.telegramBot.sendAdvertisementToGroup(advertisement);
