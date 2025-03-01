@@ -37,6 +37,7 @@ export class AdvertisementService {
 
   public async findAll(query: QueryDto): Promise<SearchResultDto> {
     let fromAdminAdvertisements = [];
+    let fromAdminCount = 0;
 
     const count = await this.advertisementModel.count({
       distinct: true,
@@ -163,115 +164,116 @@ export class AdvertisementService {
       },
     });
 
-    const fromAdminCount = await this.advertisementModel.count({
-      distinct: true,
-      col: 'id',
-      include: [
-        {
-          model: CityModel,
-          as: 'fict_city',
-          required: true,
-          where: query.city ? { id: query.city } : {},
-          attributes: { exclude: ['country_id'] },
-        },
-        {
-          model: CountryModel,
-          as: 'fict_country',
-          required: true,
-          where: query.country ? { id: query.country } : {},
-        },
-        {
-          model: FileModel,
-          as: 'media',
-          required: false,
-          order: ['order', 'ASC'],
-        },
-        {
-          model: UserModel,
-          as: 'favoritedBy',
-          required: query.favorites,
-          where: query.userId ? { id: query.userId } : {},
-        },
-        {
-          model: EngineModel,
-          as: 'engine',
-          required: true,
-          where: query.engine ? { id: query.engine } : {},
-        },
-        {
-          model: ColorModel,
-          as: 'color',
-          required: true,
-          where: query.color ? { id: query.color } : {},
-        },
-        {
-          model: CarModel,
-          as: 'model',
-          required: true,
-          where: {
-            ...(query.model ? { id: query.model } : {}),
-            ...(query.type ? { type: query.type } : {}),
+    if (!query.owned)
+      fromAdminCount = await this.advertisementModel.count({
+        distinct: true,
+        col: 'id',
+        include: [
+          {
+            model: CityModel,
+            as: 'fict_city',
+            required: true,
+            where: query.city ? { id: query.city } : {},
+            attributes: { exclude: ['country_id'] },
           },
-          include: [
-            {
-              model: MakeModel,
-              as: 'make',
-              required: true,
-              where: query.make ? { id: query.make } : {},
+          {
+            model: CountryModel,
+            as: 'fict_country',
+            required: true,
+            where: query.country ? { id: query.country } : {},
+          },
+          {
+            model: FileModel,
+            as: 'media',
+            required: false,
+            order: ['order', 'ASC'],
+          },
+          {
+            model: UserModel,
+            as: 'favoritedBy',
+            required: query.favorites,
+            where: query.userId ? { id: query.userId } : {},
+          },
+          {
+            model: EngineModel,
+            as: 'engine',
+            required: true,
+            where: query.engine ? { id: query.engine } : {},
+          },
+          {
+            model: ColorModel,
+            as: 'color',
+            required: true,
+            where: query.color ? { id: query.color } : {},
+          },
+          {
+            model: CarModel,
+            as: 'model',
+            required: true,
+            where: {
+              ...(query.model ? { id: query.model } : {}),
+              ...(query.type ? { type: query.type } : {}),
             },
-          ],
-          attributes: { exclude: ['make_id'] },
-        },
-        {
-          model: ConditionModel,
-          as: 'condition',
-          required: true,
-          where: query.condition ? { id: query.condition } : {},
-        },
-      ],
-      where: {
-        paid: query.owned ? { [Op.or]: [true, false] } : true,
-        ...(query.commercial ? { commercial: query.commercial } : {}),
-        ...(query.yearFrom && query.yearTo
-          ? {
-              year: {
-                [Op.between]: [query.yearFrom, query.yearTo],
+            include: [
+              {
+                model: MakeModel,
+                as: 'make',
+                required: true,
+                where: query.make ? { id: query.make } : {},
               },
-            }
-          : query.yearFrom
+            ],
+            attributes: { exclude: ['make_id'] },
+          },
+          {
+            model: ConditionModel,
+            as: 'condition',
+            required: true,
+            where: query.condition ? { id: query.condition } : {},
+          },
+        ],
+        where: {
+          paid: query.owned ? { [Op.or]: [true, false] } : true,
+          ...(query.commercial ? { commercial: query.commercial } : {}),
+          ...(query.yearFrom && query.yearTo
             ? {
                 year: {
-                  [Op.gte]: query.yearFrom,
+                  [Op.between]: [query.yearFrom, query.yearTo],
                 },
               }
-            : query.yearTo
+            : query.yearFrom
               ? {
                   year: {
-                    [Op.lte]: query.yearTo,
+                    [Op.gte]: query.yearFrom,
                   },
                 }
-              : {}),
-        ...(query.mileageFrom && query.mileageTo
-          ? {
-              mileage: {
-                [Op.between]: [query.mileageFrom, query.mileageTo],
-              },
-            }
-          : query.mileageFrom
+              : query.yearTo
+                ? {
+                    year: {
+                      [Op.lte]: query.yearTo,
+                    },
+                  }
+                : {}),
+          ...(query.mileageFrom && query.mileageTo
             ? {
                 mileage: {
-                  [Op.gte]: query.mileageFrom,
+                  [Op.between]: [query.mileageFrom, query.mileageTo],
                 },
               }
-            : query.mileageTo
+            : query.mileageFrom
               ? {
                   mileage: {
-                    [Op.lte]: query.mileageTo,
+                    [Op.gte]: query.mileageFrom,
                   },
                 }
-              : {}),
-      },
-    });
+              : query.mileageTo
+                ? {
+                    mileage: {
+                      [Op.lte]: query.mileageTo,
+                    },
+                  }
+                : {}),
+        },
+      });
 
     const advertisements = await this.advertisementModel.findAll({
       include: [
