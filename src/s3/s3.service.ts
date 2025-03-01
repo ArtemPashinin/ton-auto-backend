@@ -39,7 +39,7 @@ export class S3Service {
   public async uploadFile(file: Express.Multer.File): Promise<string> {
     const uuid = uuid4();
     const extension = getFileExtension(file.originalname);
-    const key = `${this.filesPath}/${uuid}.${extension}`
+    const key = `${this.filesPath}/${uuid}.${extension === 'heic' ? 'png' : extension }`
       .replace(/\s+/g, '')
       .trim();
 
