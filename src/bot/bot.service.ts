@@ -81,7 +81,9 @@ export class TelegramBot {
   public async sendAdvertisementToGroup(
     advertisement: AdvertisementModel,
   ): Promise<number[]> {
-    const caption = createAdvertisementMessage(advertisement);
+    const caption = createAdvertisementMessage(
+      advertisement.get({ plain: true }),
+    );
     const mediaGroup = mediaBuilder(advertisement.media, caption);
     const messages = await this.bot.api.sendMediaGroup(
       this.mainGroupId,
