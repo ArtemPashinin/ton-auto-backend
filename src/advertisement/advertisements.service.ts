@@ -648,7 +648,7 @@ export class AdvertisementService {
           },
         ],
       })
-    ).get({ plain: true });
+    );
   }
 
   public async deleteById(advertisementId: string): Promise<void> {
