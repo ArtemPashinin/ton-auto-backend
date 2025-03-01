@@ -10,7 +10,7 @@ export function createAdvertisementMessage(
 ⛽️${advertisement.engine.type}
 🐎${advertisement.hp}
 🌈${advertisement.color.color}
-📍${advertisement.user.city.country.title}, ${advertisement.user.city.title}
+📍${advertisement.fict_country.title || advertisement.user.city.country.title}, ${advertisement.fict_city.title || advertisement.user.city.title}
 
 ${advertisement.description}
 
