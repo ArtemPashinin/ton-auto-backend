@@ -14,5 +14,5 @@ export function createAdvertisementMessage(
 
 ${advertisement.description}
 
-💰${advertisement.price} ${advertisement.user.city.country.currency}`;
+💰${advertisement.price} ${advertisement.fict_country.currency || advertisement.user.city.country.currency}`;
 }
