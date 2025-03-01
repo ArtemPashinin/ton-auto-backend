@@ -77,8 +77,9 @@ export class AdvertisementsController {
     });
     await this.advertisementsService.addFiles(mediaData, id);
     const advertisement = await this.advertisementsService.findById(id);
-    console.error('ad:', advertisement);
+
     if (advertisement.paid && advertisement) {
+      console.log('this');
       const postsId =
         await this.telegramBot.sendAdvertisementToGroup(advertisement);
       await this.advertisementsService.createPosts(id, postsId);
