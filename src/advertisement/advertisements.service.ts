@@ -36,6 +36,8 @@ export class AdvertisementService {
   ) {}
 
   public async findAll(query: QueryDto): Promise<SearchResultDto> {
+    let fromAdminAdvertisements = [];
+
     const count = await this.advertisementModel.count({
       distinct: true,
       col: 'id',
@@ -417,136 +419,138 @@ export class AdvertisementService {
       offset: this.limit * (query.page - 1),
     });
 
-    const fromAdminAdvertisements = await this.advertisementModel.findAll({
-      include: [
-        {
-          model: CityModel,
-          as: 'fict_city',
-          required: true,
-          where: query.city ? { id: query.city } : {},
-          attributes: { exclude: ['country_id'] },
-        },
-        {
-          model: CountryModel,
-          as: 'fict_country',
-          required: true,
-          where: query.country ? { id: query.country } : {},
-        },
-        {
-          model: FileModel,
-          as: 'media',
-          required: true,
-          order: [['order', 'ASC']],
-        },
-        {
-          model: UserModel,
-          as: 'favoritedBy',
-          required: query.favorites,
-          where: query.userId ? { id: query.userId } : {},
-        },
-        {
-          model: EngineModel,
-          as: 'engine',
-          required: true,
-          where: query.engine ? { id: query.engine } : {},
-        },
-        {
-          model: ColorModel,
-          as: 'color',
-          required: true,
-          where: query.color ? { id: query.color } : {},
-        },
-        {
-          model: CarModel,
-          as: 'model',
-          required: true,
-          where: {
-            ...(query.model ? { id: query.model } : {}),
-            ...(query.type ? { type: query.type } : {}),
+    if (!query.owned)
+      fromAdminAdvertisements = await this.advertisementModel.findAll({
+        include: [
+          {
+            model: CityModel,
+            as: 'fict_city',
+            required: true,
+            where: query.city ? { id: query.city } : {},
+            attributes: { exclude: ['country_id'] },
           },
-          include: [
-            {
-              model: MakeModel,
-              as: 'make',
-              required: true,
-              where: query.make ? { id: query.make } : {},
+          {
+            model: CountryModel,
+            as: 'fict_country',
+            required: true,
+            where: query.country ? { id: query.country } : {},
+          },
+          {
+            model: FileModel,
+            as: 'media',
+            required: true,
+            order: [['order', 'ASC']],
+          },
+          {
+            model: UserModel,
+            as: 'favoritedBy',
+            required: query.favorites,
+            where: query.userId ? { id: query.userId } : {},
+          },
+          {
+            model: EngineModel,
+            as: 'engine',
+            required: true,
+            where: query.engine ? { id: query.engine } : {},
+          },
+          {
+            model: ColorModel,
+            as: 'color',
+            required: true,
+            where: query.color ? { id: query.color } : {},
+          },
+          {
+            model: CarModel,
+            as: 'model',
+            required: true,
+            where: {
+              ...(query.model ? { id: query.model } : {}),
+              ...(query.type ? { type: query.type } : {}),
             },
-          ],
-          attributes: { exclude: ['make_id'] },
-        },
-        {
-          model: ConditionModel,
-          as: 'condition',
-          required: true,
-          where: query.condition ? { id: query.condition } : {},
-        },
-      ],
-      where: {
-        paid: query.owned === true ? { [Op.or]: [true, false] } : true,
-
-        ...(query.commercial ? { commercial: query.commercial } : {}),
-        ...(query.yearFrom && query.yearTo
-          ? {
-              year: {
-                [Op.between]: [query.yearFrom, query.yearTo],
+            include: [
+              {
+                model: MakeModel,
+                as: 'make',
+                required: true,
+                where: query.make ? { id: query.make } : {},
               },
-            }
-          : query.yearFrom
+            ],
+            attributes: { exclude: ['make_id'] },
+          },
+          {
+            model: ConditionModel,
+            as: 'condition',
+            required: true,
+            where: query.condition ? { id: query.condition } : {},
+          },
+        ],
+        where: {
+          paid: query.owned === true ? { [Op.or]: [true, false] } : true,
+
+          ...(query.commercial ? { commercial: query.commercial } : {}),
+          ...(query.yearFrom && query.yearTo
             ? {
                 year: {
-                  [Op.gte]: query.yearFrom,
+                  [Op.between]: [query.yearFrom, query.yearTo],
                 },
               }
-            : query.yearTo
+            : query.yearFrom
               ? {
                   year: {
-                    [Op.lte]: query.yearTo,
+                    [Op.gte]: query.yearFrom,
                   },
                 }
-              : {}),
-        ...(query.mileageFrom && query.mileageTo
-          ? {
-              mileage: {
-                [Op.between]: [query.mileageFrom, query.mileageTo],
-              },
-            }
-          : query.mileageFrom
+              : query.yearTo
+                ? {
+                    year: {
+                      [Op.lte]: query.yearTo,
+                    },
+                  }
+                : {}),
+          ...(query.mileageFrom && query.mileageTo
             ? {
                 mileage: {
-                  [Op.gte]: query.mileageFrom,
+                  [Op.between]: [query.mileageFrom, query.mileageTo],
                 },
               }
-            : query.mileageTo
+            : query.mileageFrom
               ? {
                   mileage: {
-                    [Op.lte]: query.mileageTo,
+                    [Op.gte]: query.mileageFrom,
                   },
                 }
-              : {}),
-      },
-      attributes: {
-        exclude: [
-          'user_id',
-          'engine_id',
-          'color_id',
-          'make_id',
-          'model_id',
-          'condition_id',
-        ],
-      },
-      order: query.favorites
-        ? [
-            [
-              { model: UserModel, as: 'favoritedBy' },
-              FavoriteModel,
-              'createdAt',
-              'DESC',
-            ],
-          ] // Сортировка по дате в промежуточной таблице
-        : [['createdAt', 'DESC']],
-      limit: this.limit,
-      offset: this.limit * (query.page - 1),
-    });
+              : query.mileageTo
+                ? {
+                    mileage: {
+                      [Op.lte]: query.mileageTo,
+                    },
+                  }
+                : {}),
+        },
+        attributes: {
+          exclude: [
+            'user_id',
+            'engine_id',
+            'color_id',
+            'make_id',
+            'model_id',
+            'condition_id',
+          ],
+        },
+        order: query.favorites
+          ? [
+              [
+                { model: UserModel, as: 'favoritedBy' },
+                FavoriteModel,
+                'createdAt',
+                'DESC',
+              ],
+            ] // Сортировка по дате в промежуточной таблице
+          : [['createdAt', 'DESC']],
+        limit: this.limit,
+        offset: this.limit * (query.page - 1),
+      });
+
     const allAdvertisements = [
       ...advertisements.filter(
         (ad) =>
@@ -565,90 +569,88 @@ export class AdvertisementService {
   }
 
   public async findById(id: string): Promise<AdvertisementModel> {
-    return (
-      await this.advertisementModel.findByPk(id, {
-        include: [
-          {
-            model: CityModel,
-            as: 'fict_city',
-            required: false,
+    return await this.advertisementModel.findByPk(id, {
+      include: [
+        {
+          model: CityModel,
+          as: 'fict_city',
+          required: false,
 
-            attributes: { exclude: ['country_id'] },
-          },
-          {
-            model: CountryModel,
-            as: 'fict_country',
-            required: false,
-          },
-          { model: PostAdvertisementModel, as: 'posts', required: false },
-          {
-            model: UserModel,
-            as: 'user',
-            required: true,
+          attributes: { exclude: ['country_id'] },
+        },
+        {
+          model: CountryModel,
+          as: 'fict_country',
+          required: false,
+        },
+        { model: PostAdvertisementModel, as: 'posts', required: false },
+        {
+          model: UserModel,
+          as: 'user',
+          required: true,
 
-            include: [
-              {
-                model: CityModel,
-                as: 'city',
-                required: true,
+          include: [
+            {
+              model: CityModel,
+              as: 'city',
+              required: true,
 
-                include: [
-                  {
-                    model: CountryModel,
-                    as: 'country',
-                    required: true,
-                  },
-                ],
-                attributes: { exclude: ['country_id'] },
-              },
-            ],
-            attributes: {
-              exclude: ['city_id'],
+              include: [
+                {
+                  model: CountryModel,
+                  as: 'country',
+                  required: true,
+                },
+              ],
+              attributes: { exclude: ['country_id'] },
             },
+          ],
+          attributes: {
+            exclude: ['city_id'],
           },
-          {
-            model: FileModel,
-            as: 'media',
-            required: true,
-            order: [['order', 'ASC']],
-          },
-          {
-            model: UserModel,
-            as: 'favoritedBy',
-            required: false,
-          },
-          {
-            model: EngineModel,
-            as: 'engine',
-            required: true,
-          },
-          {
-            model: ColorModel,
-            as: 'color',
-            required: true,
-          },
-          {
-            model: CarModel,
-            as: 'model',
-            required: true,
-            include: [
-              {
-                model: MakeModel,
-                as: 'make',
-                required: true,
-              },
-            ],
-            attributes: { exclude: ['make_id'] },
-          },
+        },
+        {
+          model: FileModel,
+          as: 'media',
+          required: true,
+          order: [['order', 'ASC']],
+        },
+        {
+          model: UserModel,
+          as: 'favoritedBy',
+          required: false,
+        },
+        {
+          model: EngineModel,
+          as: 'engine',
+          required: true,
+        },
+        {
+          model: ColorModel,
+          as: 'color',
+          required: true,
+        },
+        {
+          model: CarModel,
+          as: 'model',
+          required: true,
+          include: [
+            {
+              model: MakeModel,
+              as: 'make',
+              required: true,
+            },
+          ],
+          attributes: { exclude: ['make_id'] },
+        },
 
-          {
-            model: ConditionModel,
-            as: 'condition',
-            required: true,
-          },
-        ],
-      })
-    );
+        {
+          model: ConditionModel,
+          as: 'condition',
+          required: true,
+        },
+      ],
+    });
   }
 
   public async deleteById(advertisementId: string): Promise<void> {
