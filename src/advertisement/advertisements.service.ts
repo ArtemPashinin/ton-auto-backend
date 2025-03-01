@@ -554,11 +554,11 @@ export class AdvertisementService {
       });
 
     const allAdvertisements = [
+      ...fromAdminAdvertisements,
       ...advertisements.filter(
         (ad) =>
           !fromAdminAdvertisements.some((adminAd) => adminAd.id === ad.id),
       ),
-      ...fromAdminAdvertisements,
     ];
 
     // Итоговое количество: только объявления для обычных пользователей
