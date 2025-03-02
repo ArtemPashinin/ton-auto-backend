@@ -38,6 +38,23 @@ export class AdvertisementService {
   public async findAll(query: QueryDto): Promise<SearchResultDto> {
     let fromAdminAdvertisements = [];
     let fromAdminCount = 0;
+    const fictCountryCondition = query.owned
+      ? {
+          [Op.or]: [
+            { fict_country_id: null },
+            { fict_country_id: { [Op.ne]: null } },
+          ],
+        } // Включает все значения
+      : { fict_country_id: null }; // Только null
+
+    const fictCityCondition = query.owned
+      ? {
+          [Op.or]: [
+            { fict_city_id: null },
+            { fict_city_id: { [Op.ne]: null } },
+          ],
+        } // Включает все значения
+      : { fict_city_id: null }; // Только null
 
     const count = await this.advertisementModel.count({
       distinct: true,
@@ -119,8 +136,8 @@ export class AdvertisementService {
         },
       ],
       where: {
-        fict_country_id: query.owned ? {} : null, // Исключаем объявления с fict_country
-        fict_city_id: query.owned ? {} : null,
+        ...fictCountryCondition,
+        ...fictCityCondition,
         paid: query.owned ? { [Op.or]: [true, false] } : true,
         ...(query.commercial ? { commercial: query.commercial } : {}),
         ...(query.yearFrom && query.yearTo
@@ -353,8 +370,8 @@ export class AdvertisementService {
         },
       ],
       where: {
-        fict_country_id: query.owned ? {} : null, // Исключаем объявления с fict_country
-        fict_city_id: query.owned ? {} : null,
+        ...fictCountryCondition,
+        ...fictCityCondition,
         paid: query.owned === true ? { [Op.or]: [true, false] } : true,
 
         ...(query.commercial ? { commercial: query.commercial } : {}),
