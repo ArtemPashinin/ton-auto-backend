@@ -78,6 +78,7 @@ export class UserController {
   public async createOne(
     @Body(new UserValidationPipe(userSchema)) body: UserDto,
   ): Promise<UserModel> {
+    console.log(body);
     return await this.userService.createOne(body);
   }
 

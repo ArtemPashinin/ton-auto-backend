@@ -65,7 +65,6 @@ export class AdvertisementsController {
     )
     files: Express.Multer.File[],
   ): Promise<AdvertisementModel> {
-    console.log(body);
     const { id } = await this.advertisementsService.createOne(body);
     const imageUrls = await this.s3Service.uploadMultipleFiles(files);
     const mediaData = [] as MediaDto[];
