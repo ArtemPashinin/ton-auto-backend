@@ -119,8 +119,8 @@ export class AdvertisementService {
         },
       ],
       where: {
-        fict_country_id: null, // Исключаем объявления с fict_country
-        fict_city_id: null,
+        fict_country_id: query.owned ? {} : null, // Исключаем объявления с fict_country
+        fict_city_id: query.owned ? {} : null,
         paid: query.owned ? { [Op.or]: [true, false] } : true,
         ...(query.commercial ? { commercial: query.commercial } : {}),
         ...(query.yearFrom && query.yearTo
@@ -353,8 +353,8 @@ export class AdvertisementService {
         },
       ],
       where: {
-        fict_country_id: null, // Исключаем объявления с fict_country
-        fict_city_id: null,
+        fict_country_id: query.owned ? {} : null, // Исключаем объявления с fict_country
+        fict_city_id: query.owned ? {} : null,
         paid: query.owned === true ? { [Op.or]: [true, false] } : true,
 
         ...(query.commercial ? { commercial: query.commercial } : {}),
@@ -561,7 +561,10 @@ export class AdvertisementService {
       ),
     ];
 
-    allAdvertisements.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+    allAdvertisements.sort(
+      (a, b) =>
+        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+    );
 
     // Итоговое количество: только объявления для обычных пользователей
     const totalCount = count + fromAdminCount;
