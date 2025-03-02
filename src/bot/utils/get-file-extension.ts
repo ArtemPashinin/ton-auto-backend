@@ -1,11 +1,8 @@
-// src/utils/file.ts
-
 /**
  * Возвращает расширение файла в нижнем регистре
- * @param {string} url - URL или имя файла
+ * @param {string} fileName - Имя файла или URL
  * @returns {string} - Расширение файла
  */
-export const getFileExtension = (url: string): string => {
-    return url.split('.').pop()?.toLowerCase() || '';
-  };
-  
+export const getFileExtension = (fileName: string): string => {
+  return fileName.split('.').pop()?.toLowerCase() || '';
+};

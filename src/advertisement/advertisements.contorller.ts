@@ -53,7 +53,7 @@ export class AdvertisementsController {
   // Create advertisement
 
   @Post()
-  @UseInterceptors(FilesInterceptor('files', 10))
+  @UseInterceptors(FilesInterceptor('files', 3))
   public async createOne(
     @Body(new AdvertisementValidationPipe(advertisementSchema))
     body: AdvertisementDto,
@@ -65,6 +65,7 @@ export class AdvertisementsController {
     )
     files: Express.Multer.File[],
   ): Promise<AdvertisementModel> {
+    console.log(body);
     const { id } = await this.advertisementsService.createOne(body);
     const imageUrls = await this.s3Service.uploadMultipleFiles(files);
     const mediaData = [] as MediaDto[];
