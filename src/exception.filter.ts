@@ -33,6 +33,9 @@ export class HttpExceptionFilter implements ExceptionFilter {
         timestamp: new Date().toISOString(),
       });
     }
-    this.telegramBot.sendErrorLog(exception);
+    if (exception instanceof HttpException) {
+      if (exception.getStatus() !== 404)
+        this.telegramBot.sendErrorLog(exception);
+    }
   }
 }
