@@ -4,10 +4,7 @@ import { AppModule } from './app.module';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   const environment = process.env.BOT_ENVIRONMENT;
-  console.log(environment);
-  // Условие для настройки CORS
   if (environment === 'prod') {
-    console.log('this');
     app.enableCors({
       origin: 'https://tonauto.app',
       methods: 'GET,POST,PUT,DELETE',
@@ -15,7 +12,7 @@ async function bootstrap() {
       credentials: true,
     });
   } else {
-    app.enableCors(); // Для других сред (например, разработки) включаем все по умолчанию
+    app.enableCors();
   }
 
   await app.listen(process.env.PORT || 3000);

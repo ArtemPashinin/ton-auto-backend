@@ -10,9 +10,9 @@ export function createAdvertisementMessage(
 ⛽️${advertisement.engine.type}
 🐎${advertisement.hp}
 🌈${advertisement.color.color}
-📍${advertisement.fict_country.title || advertisement.user.city.country.title}, ${advertisement.fict_city.title || advertisement.user.city.title}
+📍${advertisement.fict_country?.title || advertisement.user.city.country.title}, ${advertisement.fict_city?.title || advertisement.user.city.title}
 
 ${advertisement.description}
 
-💰${advertisement.price} ${advertisement.fict_country.currency || advertisement.user.city.country.currency}`;
+💰${advertisement.price} ${advertisement.fict_country?.currency || advertisement.user.city.country.currency}`;
 }

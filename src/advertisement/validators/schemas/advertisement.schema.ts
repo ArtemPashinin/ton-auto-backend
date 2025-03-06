@@ -19,5 +19,5 @@ export const advertisementSchema = Joi.object({
   fict_phone: Joi.string().optional(),
   commercial: Joi.boolean().required(),
   fict_country_id: Joi.number().optional().allow(''),
-  fict_city_id: Joi.number().optional().allow('')
+  fict_city_id: Joi.number().optional().allow(''),
 });

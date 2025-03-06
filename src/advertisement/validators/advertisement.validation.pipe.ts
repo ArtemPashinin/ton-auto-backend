@@ -1,10 +1,11 @@
+import { ObjectSchema } from 'joi';
+
 import {
   ArgumentMetadata,
   HttpException,
   HttpStatus,
   PipeTransform,
 } from '@nestjs/common';
-import { ObjectSchema } from 'joi';
 
 export class AdvertisementValidationPipe implements PipeTransform {
   constructor(private readonly schema: ObjectSchema) {}

@@ -1,25 +1,26 @@
+import { Op } from 'sequelize';
+import { CityModel } from 'src/user/models/city.model';
+import { CountryModel } from 'src/user/models/country.model';
+import { FavoriteModel } from 'src/user/models/favorite.model';
+import { UserModel } from 'src/user/models/user.model';
+import { UserService } from 'src/user/user.service';
+import { CarModel } from 'src/vehicle/models/car-model.model';
+import { ColorModel } from 'src/vehicle/models/color.model';
+import { EngineModel } from 'src/vehicle/models/engine.model';
+import { MakeModel } from 'src/vehicle/models/make.model';
+import { v4 as uuid } from 'uuid';
+
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
-import { AdvertisementModel } from './models/advertisement.model';
 import { AdvertisementDto } from './interfaces/dto/advertisement.dto';
-import { v4 as uuid } from 'uuid';
-import { FileModel } from './models/image.model';
-import { UserModel } from 'src/user/models/user.model';
-import { ConditionModel } from '../vehicle/models/condition.model';
-import { EngineModel } from 'src/vehicle/models/engine.model';
-import { ColorModel } from 'src/vehicle/models/color.model';
-import { MakeModel } from 'src/vehicle/models/make.model';
-import { CarModel } from 'src/vehicle/models/car-model.model';
-import { CountryModel } from 'src/user/models/country.model';
-import { CityModel } from 'src/user/models/city.model';
+import { MediaOrderDto } from './interfaces/dto/media-order.dto';
 import { MediaDto } from './interfaces/dto/mediaData.dto';
 import { QueryDto } from './interfaces/dto/query.dto';
-import { Op } from 'sequelize';
 import { SearchResultDto } from './interfaces/dto/search-result.dto';
-import { MediaOrderDto } from './interfaces/dto/media-order.dto';
+import { AdvertisementModel } from './models/advertisement.model';
+import { FileModel } from './models/image.model';
 import { PostAdvertisementModel } from './models/post-advertisement.model';
-import { UserService } from 'src/user/user.service';
-import { FavoriteModel } from 'src/user/models/favorite.model';
+import { ConditionModel } from '../vehicle/models/condition.model';
 
 @Injectable()
 export class AdvertisementService {
@@ -89,7 +90,7 @@ export class AdvertisementService {
         {
           model: FileModel,
           as: 'media',
-          required: false,
+          required: true,
           order: ['order', 'ASC'],
         },
         {
@@ -294,6 +295,12 @@ export class AdvertisementService {
 
     const advertisements = await this.advertisementModel.findAll({
       include: [
+        {
+          model: CountryModel,
+          as: 'fict_country',
+          required: false,
+          where: query.country ? { id: query.country } : {},
+        },
         {
           model: UserModel,
           as: 'user',

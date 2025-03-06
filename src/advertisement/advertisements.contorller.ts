@@ -1,3 +1,6 @@
+import { TelegramBot } from 'src/bot/bot.service';
+import { S3Service } from 'src/s3/s3.service';
+
 import {
   Body,
   Controller,
@@ -14,21 +17,19 @@ import {
   UploadedFiles,
   UseInterceptors,
 } from '@nestjs/common';
-import { AdvertisementModel } from './models/advertisement.model';
-import { AdvertisementService } from './advertisements.service';
-import { AdvertisementValidationPipe } from './validators/advertisement.validation.pipe';
-import { advertisementSchema } from './validators/schemas/advertisement.schema';
-import { AdvertisementDto } from './interfaces/dto/advertisement.dto';
 import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
-import { S3Service } from 'src/s3/s3.service';
-import { FileModel } from './models/image.model';
+import { AdvertisementService } from './advertisements.service';
+import { AdvertisementDto } from './interfaces/dto/advertisement.dto';
+import { MediaOrderDto } from './interfaces/dto/media-order.dto';
 import { MediaDto } from './interfaces/dto/mediaData.dto';
 import { QueryDto } from './interfaces/dto/query.dto';
-import { QueryValidationPipe } from './validators/qery.validation.pipe';
-import { querySchema } from './validators/schemas/query.schema';
 import { SearchResultDto } from './interfaces/dto/search-result.dto';
-import { MediaOrderDto } from './interfaces/dto/media-order.dto';
-import { TelegramBot } from 'src/bot/bot.service';
+import { AdvertisementModel } from './models/advertisement.model';
+import { FileModel } from './models/image.model';
+import { AdvertisementValidationPipe } from './validators/advertisement.validation.pipe';
+import { QueryValidationPipe } from './validators/qery.validation.pipe';
+import { advertisementSchema } from './validators/schemas/advertisement.schema';
+import { querySchema } from './validators/schemas/query.schema';
 
 @Controller('advertisements')
 export class AdvertisementsController {
@@ -154,11 +155,13 @@ export class AdvertisementsController {
     const advertisement = await this.advertisementsService.findById(id);
     if (advertisement) {
       const { id: advertisementId, media, posts } = advertisement;
-      const postsId = posts.map(({ post_id }) => post_id);
-      await this.telegramBot.removePosts(postsId);
       const imagesUrl = media.map((image) => image.image_url);
       await this.s3Service.deleteMultipleFiles(imagesUrl);
       await this.advertisementsService.deleteById(advertisementId);
+      try {
+        const postsId = posts.map(({ post_id }) => post_id);
+        await this.telegramBot.removePosts(postsId);
+      } catch {}
     }
   }
 

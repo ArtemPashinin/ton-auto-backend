@@ -1,7 +1,8 @@
-import { Injectable, OnModuleInit } from '@nestjs/common';
 import { Composer, Context } from 'grammy';
-import { TelegramBot } from '../bot.service';
 import { AdvertisementService } from 'src/advertisement/advertisements.service';
+
+import { Injectable, OnModuleInit } from '@nestjs/common';
+import { TelegramBot } from '../bot.service';
 
 @Injectable()
 export class PaymentComposer implements OnModuleInit {
@@ -32,7 +33,6 @@ export class PaymentComposer implements OnModuleInit {
 
   private async successfulPayment(ctx: Context): Promise<void> {
     if (!ctx.message || !ctx.message.successful_payment || !ctx.from) return;
-
     const { advertisement_id: id } = JSON.parse(
       ctx.message.successful_payment.invoice_payload,
     );
@@ -41,6 +41,7 @@ export class PaymentComposer implements OnModuleInit {
     if (advertisement && advertisement.paid) {
       const postsId =
         await this.telegramBot.sendAdvertisementToGroup(advertisement);
+
       await this.advertisementsService.createPosts(id, postsId);
     }
   }
