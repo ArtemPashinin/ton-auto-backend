@@ -1,4 +1,4 @@
-import { Op } from 'sequelize';
+import { col, fn, Op, where } from 'sequelize';
 import { CityModel } from 'src/user/models/city.model';
 import { CountryModel } from 'src/user/models/country.model';
 import { FavoriteModel } from 'src/user/models/favorite.model';
@@ -17,6 +17,7 @@ import { MediaOrderDto } from './interfaces/dto/media-order.dto';
 import { MediaDto } from './interfaces/dto/mediaData.dto';
 import { QueryDto } from './interfaces/dto/query.dto';
 import { SearchResultDto } from './interfaces/dto/search-result.dto';
+import { StatisticResponse } from './interfaces/statistic-response.interface';
 import { AdvertisementModel } from './models/advertisement.model';
 import { FileModel } from './models/image.model';
 import { PostAdvertisementModel } from './models/post-advertisement.model';
@@ -34,6 +35,8 @@ export class AdvertisementService {
     private readonly fileModel: typeof FileModel,
     @InjectModel(PostAdvertisementModel)
     private readonly postAdvertisementModel: typeof PostAdvertisementModel,
+    @InjectModel(CountryModel)
+    private readonly countryModel: typeof CountryModel,
   ) {}
 
   public async findAll(query: QueryDto): Promise<SearchResultDto> {
@@ -806,5 +809,209 @@ export class AdvertisementService {
       advertisement_id: advertisementId,
     }));
     await this.postAdvertisementModel.bulkCreate(postsData);
+  }
+
+  public async statistic(): Promise<StatisticResponse> {
+    const result: { [key: string]: { [key: string]: string } } = {};
+    const withoutAdminResult: { [key: string]: { [key: string]: string } } = {};
+
+    const countries = await this.countryModel.findAll({
+      include: [{ model: CityModel, as: 'cities', required: true }],
+    });
+
+    const totalAds = await this.advertisementModel.findAll({
+      include: [
+        {
+          model: UserModel,
+          as: 'user',
+          required: true,
+          include: [
+            {
+              model: CityModel,
+              as: 'city',
+              required: true,
+              include: [{ model: CountryModel, as: 'country', required: true }],
+            },
+          ],
+        },
+      ],
+      attributes: ['id'],
+      where: { fict_country_id: null, fict_city_id: null },
+    });
+
+    const totalAdsFromAdmin = await this.advertisementModel.findAll({
+      include: [
+        {
+          model: UserModel,
+          as: 'user',
+          required: true,
+          where: { admin: true },
+          attributes: [],
+        },
+        { model: CountryModel, as: 'fict_country', required: true },
+        { model: CityModel, as: 'fict_city', required: true },
+      ],
+      attributes: ['id'],
+    });
+    countries.forEach((country) => {
+      const count = totalAds.filter(
+        (ad) => ad.user.city.country.title === country.title,
+      ).length;
+      const fromAdmin = totalAdsFromAdmin.filter(
+        (ad) => ad.fict_country.title === country.title,
+      ).length;
+      result[`🔸${country.title}`] = {
+        Всего: `${count + fromAdmin}`,
+      };
+      country.cities.forEach((city) => {
+        const count = totalAds.filter(
+          (ad) => ad.user.city.title === city.title,
+        ).length;
+        const fromAdmin = totalAdsFromAdmin.filter(
+          (ad) => ad.fict_city.title === city.title,
+        ).length;
+        if (count > 0 || fromAdmin > 0)
+          result[`🔸${country.title}`][city.title] = `${count + fromAdmin}`;
+      });
+    });
+    //without admin
+    countries.forEach((country) => {
+      const count = totalAds.filter(
+        (ad) => ad.user.city.country.title === country.title,
+      ).length;
+      withoutAdminResult[`🔸${country.title}`] = {
+        Всего: `${count}`,
+      };
+      country.cities.forEach((city) => {
+        const count = totalAds.filter(
+          (ad) => ad.user.city.title === city.title,
+        ).length;
+        if (count > 0)
+          withoutAdminResult[`🔸${country.title}`][city.title] = `${count}`;
+      });
+    });
+    return {
+      totalCount: totalAds.length + totalAdsFromAdmin.length,
+      totalWithoutAdmin: totalAds.length,
+      result: JSON.stringify(result, null, 2),
+      resultWithoutAdmin: JSON.stringify(withoutAdminResult, null, 2),
+    };
+  }
+
+  public async anotherStats() {
+    const totalCount = await this.advertisementModel.count();
+    try {
+      // Загрузка стран с городами для агрегации
+      const countries = await this.countryModel.findAll({
+        include: [{ model: CityModel, as: 'cities', required: true }],
+      });
+
+      // Подсчёт количества объявлений с учётом стран и городов, агрегация на уровне SQL
+      const adCounts = await this.advertisementModel.findAll({
+        attributes: [
+          [fn('COUNT', col('AdvertisementModel.id')), 'count'],
+          'user.city.country.title', // Название страны
+          'user.city.title', // Название города
+        ],
+        include: [
+          {
+            model: UserModel,
+            as: 'user',
+            required: true,
+            where: { admin: false },
+            include: [
+              {
+                model: CityModel,
+                as: 'city',
+                required: true,
+                include: [
+                  { model: CountryModel, as: 'country', required: true },
+                ],
+              },
+            ],
+          },
+        ],
+        where: { fict_country_id: null, fict_city_id: null },
+        group: ['user.city.country.title', 'user.city.title'], // Группировка по странам и городам
+        raw: true, // Вернёт результат в виде обычного объекта, а не экземпляров моделей
+      });
+
+      // Подсчёт количества объявлений от администраторов
+      const adminAdCounts = await this.advertisementModel.findAll({
+        attributes: [
+          [fn('COUNT', col('AdvertisementModel.id')), 'count'],
+          'fict_country.title', // Название страны
+          'fict_city.title', // Название города
+        ],
+        include: [
+          {
+            model: UserModel,
+            as: 'user',
+            required: true,
+            where: { admin: true },
+            attributes: [],
+          },
+          { model: CountryModel, as: 'fict_country', required: true },
+          { model: CityModel, as: 'fict_city', required: true },
+        ],
+        group: ['fict_country.title', 'fict_city.title'], // Группировка по фейковым странам и городам
+        raw: true,
+      });
+
+      // Формирование итоговых данных
+      const countryAdCounts: { [key: string]: number } = {};
+
+      adCounts.forEach((ad) => {
+        const country = ad['user.city.country.title'];
+        const city = ad['user.city.title'];
+        const count = ad['count'];
+
+        if (!countryAdCounts[country]) {
+          countryAdCounts[country] = 0;
+        }
+        countryAdCounts[country] += count;
+
+        console.log(`${country}: ${countryAdCounts[country]}`);
+        console.log(`   ${city}: ${count}`);
+      });
+
+      // Подсчёт административных объявлений
+      adminAdCounts.forEach((ad) => {
+        const country = ad['fict_country.title'];
+        const city = ad['fict_city.title'];
+        const count = ad['count'];
+
+        if (!countryAdCounts[country]) {
+          countryAdCounts[country] = 0;
+        }
+        countryAdCounts[country] += count;
+
+        console.log(`${country} (Admin): ${countryAdCounts[country]}`);
+        console.log(`   ${city} (Admin): ${count}`);
+      });
+
+      // Подсчёт только для пользовательских объявлений (без администраторов)
+      console.log('Пользовательские:');
+      countries.forEach((country) => {
+        const countByCountry = adCounts
+          .filter((ad) => ad['user.city.country.title'] === country.title)
+          .reduce((acc, ad) => acc + ad['count'], 0);
+
+        console.log(`${country.title}: ${countByCountry}`);
+
+        // Подсчёт по городам
+        country.cities.forEach((city) => {
+          const countByCity = adCounts
+            .filter((ad) => ad['user.city.title'] === city.title)
+            .reduce((acc, ad) => acc + ad['count'], 0);
+
+          if (countByCity > 0) {
+            console.log(`   ${city.title}: ${countByCity}`);
+          }
+        });
+      });
+    } catch (err) {
+      console.log(err);
+    }
   }
 }

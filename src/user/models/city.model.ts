@@ -3,9 +3,12 @@ import {
   Column,
   DataType,
   ForeignKey,
+  HasMany,
   Model,
   Table,
 } from 'sequelize-typescript';
+import { AdvertisementModel } from 'src/advertisement/models/advertisement.model';
+
 import { CountryModel } from './country.model';
 
 @Table({ tableName: 'city', timestamps: false })
@@ -22,4 +25,7 @@ export class CityModel extends Model<CityModel> {
 
   @BelongsTo(() => CountryModel)
   country: CountryModel;
+
+  @HasMany(() => AdvertisementModel)
+  advertisements: AdvertisementModel[];
 }

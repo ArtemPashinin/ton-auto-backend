@@ -1,4 +1,7 @@
 import { Column, DataType, HasMany, Model, Table } from 'sequelize-typescript';
+import { AdvertisementModel } from 'src/advertisement/models/advertisement.model';
+
+import { CityModel } from './city.model';
 
 @Table({ tableName: 'country', timestamps: false })
 export class CountryModel extends Model<CountryModel> {
@@ -13,4 +16,7 @@ export class CountryModel extends Model<CountryModel> {
 
   @Column({ type: DataType.CHAR(8), allowNull: true, defaultValue: '+1' })
   phone_code: string;
+
+  @HasMany(() => CityModel)
+  cities: CityModel[];
 }

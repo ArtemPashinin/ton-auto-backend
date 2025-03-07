@@ -1,8 +1,10 @@
-import { Injectable } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
 import { Bot } from 'grammy';
 import { WebAppInfo } from 'grammy/types';
 import { AdvertisementModel } from 'src/advertisement/models/advertisement.model';
+
+import { Injectable } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+
 import { createAdvertisementMessage } from './utils/create-assistant-message';
 import { mediaBuilder } from './utils/media-builder';
 
@@ -15,6 +17,7 @@ export class TelegramBot {
   private errorLogging = false;
   private errorLogTimeout = 5000;
   private placePrice: number;
+  private adminIdList: number[];
 
   constructor(private readonly configService: ConfigService) {
     this.mainGroupId = configService.get<number | string>('MAIN_GROUP');
@@ -23,12 +26,16 @@ export class TelegramBot {
     );
     this.webAppInfo = { url: configService.get<string>('WEBAPP_URL') };
     this.placePrice = configService.get<number>('PLACE_PRICE');
-    this.bot = new Bot(configService.get<string>('BOT_TOKEN'), {
-      client: {
-        environment:
-          configService.get<'test' | 'prod'>('BOT_ENVIRONMENT') || 'prod',
-      },
-    });
+    (this.adminIdList = this.configService
+      .get<string>('ADMINS')
+      .split(',')
+      .map((adminId) => parseInt(adminId))),
+      (this.bot = new Bot(configService.get<string>('BOT_TOKEN'), {
+        client: {
+          environment:
+            configService.get<'test' | 'prod'>('BOT_ENVIRONMENT') || 'prod',
+        },
+      }));
 
     this.bot.catch((error) => {
       if (!this.errorLogging) {
@@ -47,6 +54,10 @@ export class TelegramBot {
 
   public getBot(): Bot {
     return this.bot;
+  }
+
+  public getAdminIdList(): number[] {
+    return this.adminIdList;
   }
 
   public getMainGroupId(): string | number {
