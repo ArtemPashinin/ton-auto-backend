@@ -39,11 +39,6 @@ export class AdvertisementsController {
     private readonly telegramBot: TelegramBot,
   ) {}
 
-  @Get('test')
-  public async test() {
-    await this.advertisementsService.changeCity();
-  }
-
   @Get()
   public async findAll(
     @Query(new QueryValidationPipe(querySchema)) query: QueryDto,

@@ -25,7 +25,7 @@ export class AdminComposer implements OnModuleInit {
   }
 
   private registerHandlers(): void {
-    this.composer.command('stats', (ctx) => this.preCheckoutQuery(ctx));
+    this.composer.command('stat', (ctx) => this.preCheckoutQuery(ctx));
   }
 
   private async preCheckoutQuery(ctx: Context): Promise<void> {

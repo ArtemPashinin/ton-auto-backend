@@ -976,24 +976,4 @@ export class AdvertisementService {
       console.log(err);
     }
   }
-
-  public async changeCity() {
-    const ads = await this.advertisementModel.findAll({
-      where: { fict_city_id: null },
-      include: [
-        {
-          model: UserModel,
-          as: 'user',
-          required: true,
-          include: [{ model: CityModel, as: 'city', required: true }],
-        },
-      ],
-    });
-    ads.forEach(async (ad) => {
-      ad.fict_city_id = ad.user.city_id;
-      ad.fict_country_id = ad.user.city.country_id;
-      await ad.save();
-    });
-    console.log(ads.length);
-  }
 }
