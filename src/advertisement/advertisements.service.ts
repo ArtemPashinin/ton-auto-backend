@@ -299,9 +299,16 @@ export class AdvertisementService {
     const advertisements = await this.advertisementModel.findAll({
       include: [
         {
+          model: CityModel,
+          as: 'fict_city',
+          required: true,
+          where: query.city ? { id: query.city } : {},
+          attributes: { exclude: ['country_id'] },
+        },
+        {
           model: CountryModel,
           as: 'fict_country',
-          required: false,
+          required: true,
           where: query.country ? { id: query.country } : {},
         },
         {
@@ -309,26 +316,6 @@ export class AdvertisementService {
           as: 'user',
           required: true,
           where: query.owned ? { id: query.userId } : {},
-          include: [
-            {
-              model: CityModel,
-              as: 'city',
-              required: true,
-              where: query.city ? { id: query.city } : {},
-              include: [
-                {
-                  model: CountryModel,
-                  as: 'country',
-                  required: true,
-                  where: query.country ? { id: query.country } : {},
-                },
-              ],
-              attributes: { exclude: ['country_id'] },
-            },
-          ],
-          attributes: {
-            exclude: ['city_id'],
-          },
         },
         {
           model: FileModel,
@@ -609,7 +596,6 @@ export class AdvertisementService {
           model: CityModel,
           as: 'fict_city',
           required: false,
-
           attributes: { exclude: ['country_id'] },
         },
         {
@@ -622,26 +608,6 @@ export class AdvertisementService {
           model: UserModel,
           as: 'user',
           required: true,
-
-          include: [
-            {
-              model: CityModel,
-              as: 'city',
-              required: true,
-
-              include: [
-                {
-                  model: CountryModel,
-                  as: 'country',
-                  required: true,
-                },
-              ],
-              attributes: { exclude: ['country_id'] },
-            },
-          ],
-          attributes: {
-            exclude: ['city_id'],
-          },
         },
         {
           model: FileModel,
@@ -708,6 +674,8 @@ export class AdvertisementService {
       id: uuid(), // Генерируем уникальный идентификатор
       paid: paid, // Устанавливаем статус оплаты
       ...advertisement, // Остальные данные из DTO
+      fict_city_id: user.city_id,
+      fict_country_id: user.city.country_id,
     });
 
     return createdAdvertisement;
@@ -825,18 +793,12 @@ export class AdvertisementService {
           model: UserModel,
           as: 'user',
           required: true,
-          include: [
-            {
-              model: CityModel,
-              as: 'city',
-              required: true,
-              include: [{ model: CountryModel, as: 'country', required: true }],
-            },
-          ],
+          where: { admin: false },
         },
+        { model: CountryModel, as: 'fict_country', required: true },
+        { model: CityModel, as: 'fict_city', required: true },
       ],
       attributes: ['id'],
-      where: { fict_country_id: null, fict_city_id: null },
     });
 
     const totalAdsFromAdmin = await this.advertisementModel.findAll({
@@ -855,7 +817,7 @@ export class AdvertisementService {
     });
     countries.forEach((country) => {
       const count = totalAds.filter(
-        (ad) => ad.user.city.country.title === country.title,
+        (ad) => ad.fict_country.title === country.title,
       ).length;
       const fromAdmin = totalAdsFromAdmin.filter(
         (ad) => ad.fict_country.title === country.title,
@@ -865,7 +827,7 @@ export class AdvertisementService {
       };
       country.cities.forEach((city) => {
         const count = totalAds.filter(
-          (ad) => ad.user.city.title === city.title,
+          (ad) => ad.fict_city.title === city.title,
         ).length;
         const fromAdmin = totalAdsFromAdmin.filter(
           (ad) => ad.fict_city.title === city.title,
@@ -877,14 +839,14 @@ export class AdvertisementService {
     //without admin
     countries.forEach((country) => {
       const count = totalAds.filter(
-        (ad) => ad.user.city.country.title === country.title,
+        (ad) => ad.fict_country.title === country.title,
       ).length;
       withoutAdminResult[`🔸${country.title}`] = {
         Всего: `${count}`,
       };
       country.cities.forEach((city) => {
         const count = totalAds.filter(
-          (ad) => ad.user.city.title === city.title,
+          (ad) => ad.fict_city.title === city.title,
         ).length;
         if (count > 0)
           withoutAdminResult[`🔸${country.title}`][city.title] = `${count}`;
@@ -1013,5 +975,25 @@ export class AdvertisementService {
     } catch (err) {
       console.log(err);
     }
+  }
+
+  public async changeCity() {
+    const ads = await this.advertisementModel.findAll({
+      where: { fict_city_id: null },
+      include: [
+        {
+          model: UserModel,
+          as: 'user',
+          required: true,
+          include: [{ model: CityModel, as: 'city', required: true }],
+        },
+      ],
+    });
+    ads.forEach(async (ad) => {
+      ad.fict_city_id = ad.user.city_id;
+      ad.fict_country_id = ad.user.city.country_id;
+      await ad.save();
+    });
+    console.log(ads.length);
   }
 }

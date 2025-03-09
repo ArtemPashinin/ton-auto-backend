@@ -1,13 +1,14 @@
+import { Op } from 'sequelize';
+import { AdvertisementModel } from 'src/advertisement/models/advertisement.model';
+
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
-import { UserModel } from './models/user.model';
-import { UserDto } from './interfaces/dto/user.dto';
-import { FavoriteModel } from './models/favorite.model';
-import { AdvertisementModel } from 'src/advertisement/models/advertisement.model';
 import { FindtUserDto } from './interfaces/dto/find-user.dto';
-import { Op } from 'sequelize';
-import { CountryModel } from './models/country.model';
+import { UserDto } from './interfaces/dto/user.dto';
 import { CityModel } from './models/city.model';
+import { CountryModel } from './models/country.model';
+import { FavoriteModel } from './models/favorite.model';
+import { UserModel } from './models/user.model';
 
 @Injectable()
 export class UserService {
@@ -29,6 +30,11 @@ export class UserService {
           model: AdvertisementModel,
           as: 'favoriteAdvertisements',
           required: false,
+        },
+        {
+          model: CityModel,
+          as: 'city',
+          required: true,
         },
       ],
     });

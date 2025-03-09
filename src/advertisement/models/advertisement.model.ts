@@ -8,17 +8,18 @@ import {
   HasMany,
   BelongsToMany,
 } from 'sequelize-typescript';
-import { UserModel } from 'src/user/models/user.model';
-import { FileModel } from './image.model';
-import { FavoriteModel } from 'src/user/models/favorite.model';
-import { ConditionModel } from '../../vehicle/models/condition.model';
-import { MakeModel } from 'src/vehicle/models/make.model';
-import { CarModel } from 'src/vehicle/models/car-model.model';
-import { EngineModel } from 'src/vehicle/models/engine.model';
-import { ColorModel } from 'src/vehicle/models/color.model';
-import { PostAdvertisementModel } from './post-advertisement.model';
-import { CountryModel } from 'src/user/models/country.model';
 import { CityModel } from 'src/user/models/city.model';
+import { CountryModel } from 'src/user/models/country.model';
+import { FavoriteModel } from 'src/user/models/favorite.model';
+import { UserModel } from 'src/user/models/user.model';
+import { CarModel } from 'src/vehicle/models/car-model.model';
+import { ColorModel } from 'src/vehicle/models/color.model';
+import { EngineModel } from 'src/vehicle/models/engine.model';
+import { MakeModel } from 'src/vehicle/models/make.model';
+
+import { FileModel } from './image.model';
+import { PostAdvertisementModel } from './post-advertisement.model';
+import { ConditionModel } from '../../vehicle/models/condition.model';
 
 @Table({
   tableName: 'advertisements',
