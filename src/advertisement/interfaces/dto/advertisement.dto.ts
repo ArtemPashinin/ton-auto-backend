@@ -13,5 +13,7 @@ export interface AdvertisementDto {
   description: string;
   paid: boolean;
   fict_phone?: string;
+  fict_country_id?: number;
+  fict_city_id?: number;
   meta: MetaDto[];
 }

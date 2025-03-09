@@ -674,8 +674,6 @@ export class AdvertisementService {
       id: uuid(), // Генерируем уникальный идентификатор
       paid: paid, // Устанавливаем статус оплаты
       ...advertisement, // Остальные данные из DTO
-      fict_city_id: user.city_id,
-      fict_country_id: user.city.country_id,
     });
 
     return createdAdvertisement;
