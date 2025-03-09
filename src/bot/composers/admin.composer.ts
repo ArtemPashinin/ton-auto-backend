@@ -4,6 +4,7 @@ import { AdvertisementService } from 'src/advertisement/advertisements.service';
 import { Injectable, OnModuleInit } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { TelegramBot } from '../bot.service';
+import { ChatType } from '../enums/chat-types.enum';
 import { isUserAdminFilter } from '../filters/is-user-admin.filter';
 
 @Injectable()
@@ -20,6 +21,7 @@ export class AdminComposer implements OnModuleInit {
     this.registerHandlers();
     this.telegramBot
       .getBot()
+      .chatType(ChatType.PRIVATE)
       .filter(isUserAdminFilter(this.telegramBot.getAdminIdList()))
       .use(this.composer);
   }
