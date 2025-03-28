@@ -31,7 +31,7 @@ export class UserComposer implements OnModuleInit {
 
   private async start(ctx: Context): Promise<void> {
     await ctx.reply(
-      `🚗 Welcome to AutoHub!
+      `🚗 Welcome to Drivio!
 Looking for a new ride or ready to sell your car? I'm here to make it quick and simple!
 ✅ Browse listings for new and used cars
 ✅ Post your car for sale in just a few steps
