@@ -1,5 +1,7 @@
-import { Injectable, OnModuleInit } from '@nestjs/common';
 import { Composer, Context, InlineKeyboard } from 'grammy';
+import { ForceReply } from 'grammy/types';
+
+import { Injectable, OnModuleInit } from '@nestjs/common';
 import { TelegramBot } from '../bot.service';
 import { ChatType } from '../enums/chat-types.enum';
 

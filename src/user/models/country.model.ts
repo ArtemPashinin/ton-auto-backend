@@ -14,7 +14,7 @@ export class CountryModel extends Model<CountryModel> {
   @Column({ type: DataType.CHAR(16), allowNull: true })
   currency: string;
 
-  @Column({ type: DataType.CHAR(8), allowNull: true, defaultValue: '+1' })
+  @Column({ type: DataType.CHAR(8), allowNull: true, defaultValue: '1' })
   phone_code: string;
 
   @HasMany(() => CityModel)
