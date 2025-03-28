@@ -9,7 +9,7 @@ async function bootstrap() {
       origin: [
         'https://tonauto.app',
         'https://vuzcrmplus.store/',
-        'https://drivio.space/',
+        'https://drivio.space',
       ],
       methods: 'GET,POST,PUT,DELETE',
       allowedHeaders: 'Content-Type, Authorization',
