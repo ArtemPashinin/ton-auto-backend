@@ -1,3 +1,5 @@
+import { AdvertisementService } from 'src/advertisement/advertisements.service';
+
 import {
   Body,
   Controller,
@@ -9,20 +11,19 @@ import {
   Query,
   UseFilters,
 } from '@nestjs/common';
-import { UserService } from './user.service';
+import { FavoriteDto } from './interfaces/dto/favorite.dto';
+import { FindtUserDto } from './interfaces/dto/find-user.dto';
 import { UserDto } from './interfaces/dto/user.dto';
-import { UserValidationPipe } from './validators/user.validation.pipe';
-import { userSchema } from './validators/schemas/user.schema';
+import { CityModel } from './models/city.model';
+import { CountryModel } from './models/country.model';
+import { FavoriteModel } from './models/favorite.model';
 import { UserModel } from './models/user.model';
 import { UserExceptionFilter } from './user.exception.filter';
-import { FavoriteDto } from './interfaces/dto/favorite.dto';
+import { UserService } from './user.service';
 import { favoriteSchema } from './validators/schemas/favortie.schema';
-import { AdvertisementService } from 'src/advertisement/advertisements.service';
-import { FavoriteModel } from './models/favorite.model';
-import { FindtUserDto } from './interfaces/dto/find-user.dto';
 import { findUserSchema } from './validators/schemas/find-user.schema';
-import { CountryModel } from './models/country.model';
-import { CityModel } from './models/city.model';
+import { userSchema } from './validators/schemas/user.schema';
+import { UserValidationPipe } from './validators/user.validation.pipe';
 
 @Controller('user')
 @UseFilters(UserExceptionFilter)

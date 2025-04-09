@@ -106,11 +106,14 @@ export class UserService {
   }
 
   public async findAllCountries(): Promise<CountryModel[]> {
-    return await this.countryModel.findAll();
+    return await this.countryModel.findAll({ order: [['title', 'ASC']] });
   }
 
   public async findCities(countryId: number): Promise<CityModel[]> {
-    return await this.cityModel.findAll({ where: { country_id: countryId } });
+    return await this.cityModel.findAll({
+      where: { country_id: countryId },
+      order: [['title', 'ASC']],
+    });
   }
 
   public async createFavorite(
