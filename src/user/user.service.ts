@@ -34,8 +34,9 @@ export class UserService {
         {
           model: CityModel,
           as: 'city',
-          required: true,
+          required: false,
         },
+        { model: CountryModel, as: 'country', required: true },
       ],
     });
   }
@@ -58,9 +59,9 @@ export class UserService {
         {
           model: CityModel,
           as: 'city',
-          required: true,
-          include: [{ model: CountryModel, as: 'country', required: true }],
+          required: false,
         },
+        { model: CountryModel, as: 'country', required: true },
       ],
     });
   }
@@ -69,19 +70,6 @@ export class UserService {
     const [user, created] = await this.userModel.findOrCreate({
       where: { user_id: userDto.user_id }, // Условие поиска
       defaults: userDto,
-      include: [
-        {
-          model: AdvertisementModel,
-          as: 'favoriteAdvertisements',
-          required: false,
-        },
-        {
-          model: CityModel,
-          as: 'city',
-          required: true,
-          include: [{ model: CountryModel, as: 'country', required: true }],
-        },
-      ],
     });
 
     if (!created) {
@@ -98,9 +86,9 @@ export class UserService {
         {
           model: CityModel,
           as: 'city',
-          required: true,
-          include: [{ model: CountryModel, as: 'country', required: true }],
+          required: false,
         },
+        { model: CountryModel, as: 'country', required: true },
       ],
     });
   }

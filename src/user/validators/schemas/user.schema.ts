@@ -7,5 +7,6 @@ export const userSchema = Joi.object({
   last_name: Joi.string().optional().empty().allow(''),
   phone: Joi.string().optional(),
   language_code: Joi.string().optional(),
-  city_id: Joi.number().required(),
+  city_id: Joi.number().optional().allow(null),
+  country_id: Joi.number().required(),
 });

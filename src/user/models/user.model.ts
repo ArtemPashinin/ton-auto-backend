@@ -9,8 +9,10 @@ import {
   BelongsTo,
 } from 'sequelize-typescript';
 import { AdvertisementModel } from 'src/advertisement/models/advertisement.model';
-import { FavoriteModel } from './favorite.model';
+
 import { CityModel } from './city.model';
+import { CountryModel } from './country.model';
+import { FavoriteModel } from './favorite.model';
 
 @Table({
   tableName: 'users',
@@ -23,8 +25,8 @@ export class UserModel extends Model<UserModel> {
   })
   id: number;
 
-  @Column({type: DataType.BOOLEAN, defaultValue: false})
-  admin: boolean
+  @Column({ type: DataType.BOOLEAN, defaultValue: false })
+  admin: boolean;
 
   @Column({
     type: DataType.INTEGER,
@@ -62,6 +64,13 @@ export class UserModel extends Model<UserModel> {
 
   @BelongsTo(() => CityModel)
   city: CityModel;
+
+  @ForeignKey(() => CountryModel)
+  @Column({ type: DataType.INTEGER, allowNull: false })
+  country_id: number;
+
+  @BelongsTo(() => CountryModel)
+  country: CountryModel;
 
   @Column({ type: DataType.CHAR(6), defaultValue: 'en' })
   language_code: string;

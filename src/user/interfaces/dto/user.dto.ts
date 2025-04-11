@@ -6,4 +6,6 @@ export interface UserDto {
   phone?: string;
   language_code?: string;
   free_publish?: boolean;
+  country_id?: number;
+  city_id?: number;
 }
