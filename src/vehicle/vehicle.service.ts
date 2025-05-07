@@ -19,7 +19,7 @@ export class VehicleService {
   ) {}
 
   public async getMakes(): Promise<MakeModel[]> {
-    return await this.makeModel.findAll();
+    return await this.makeModel.findAll({ order: [['make', 'ASC']] });
   }
 
   public async getExistsMakes(): Promise<MakeModel[]> {
