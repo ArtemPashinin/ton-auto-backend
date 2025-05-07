@@ -39,7 +39,8 @@ export class VehicleService {
           required: true,
         },
       ],
-      group: ['MakeModel.id'],
+      group: ['makes.id'],
+      order: [['make', 'ASC']],
     });
     return makes;
   }
