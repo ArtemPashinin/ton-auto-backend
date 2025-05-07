@@ -575,10 +575,12 @@ export class AdvertisementService {
       ),
     ];
 
-    allAdvertisements.sort(
-      (a, b) =>
-        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
-    );
+    if (!query.favorites) {
+      allAdvertisements.sort(
+        (a, b) =>
+          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+      );
+    }
 
     // Итоговое количество: только объявления для обычных пользователей
     const totalCount = count + fromAdminCount;
