@@ -1,22 +1,110 @@
-## Description
+# TON Auto Backend
 
+## Краткое описание
+**TON Auto Backend** — это серверная часть приложения для публикации и поиска автомобильных объявлений. API обслуживает веб‑клиент и Telegram-интеграцию: хранит объявления и пользователей, управляет медиафайлами, возвращает справочные данные по авто и синхронизирует публикации в Telegram.
 
+## Зачем нужен проект
+Проект решает задачу единого бэкенда для автоплатформы:
+- централизует работу с объявлениями и фильтрацией;
+- хранит профили пользователей и избранное;
+- предоставляет справочники (марки, модели, двигатели, цвета, состояния);
+- автоматизирует публикацию объявлений в Telegram;
+- хранит изображения объявлений в S3-совместимом хранилище.
 
-## Project setup
+## Что делает приложение
+### Основные модули
+- **Advertisements** — CRUD для объявлений, фильтрация/поиск, управление медиа, смена main-фото, удаление объявлений и связанных файлов.
+- **User** — создание/обновление пользователя, получение страны/города, добавление и удаление избранного.
+- **Vehicle** — выдача справочников авто (марки, модели, типы двигателя, цвета, состояния).
+- **S3** — загрузка/удаление одного и нескольких файлов в S3-хранилище.
+- **Bot** — отправка карточек объявлений в Telegram-группу и удаление постов при удалении объявления.
 
+### Как это работает (высокоуровнево)
+1. Клиент отправляет данные объявления и изображения.
+2. Бэкенд валидирует payload (Joi + кастомные pipe), создает запись в MySQL.
+3. Изображения загружаются в S3, ссылки сохраняются в БД.
+4. Бот публикует медиа-группу в Telegram и сохраняет `message_id` постов для дальнейшего удаления.
+5. При удалении объявления удаляются Telegram-посты и медиа-файлы из хранилища.
+
+## На базе чего построено
+- Архитектура на **NestJS** (модульная структура + DI).
+- ORM: **Sequelize + sequelize-typescript**.
+- База данных: **MySQL**.
+- Хранилище файлов: **AWS S3 API** (или совместимый провайдер).
+- Telegram-интеграция: **grammY**.
+- Валидация входящих данных: **Joi** + кастомные NestJS Pipes.
+
+## Технологический стек
+### Backend
+- Node.js
+- TypeScript
+- NestJS 10
+- Express (через Nest platform-express)
+
+### Data & Storage
+- MySQL
+- Sequelize / sequelize-typescript
+- AWS SDK v3 (`@aws-sdk/client-s3`)
+
+### Integrations
+- Telegram Bot API (`grammy`)
+
+### Validation & Utilities
+- Joi
+- Multer (загрузка файлов)
+- UUID
+
+## Быстрый старт
+### 1) Установка зависимостей
 ```bash
-$ npm install
+npm install
 ```
 
-## Compile and run the project
+### 2) Настройка окружения
+Создайте файл `.env` и заполните основные переменные:
 
+```env
+PORT=3000
+
+# Database
+HOST=...
+DBUSERNAME=...
+PASSWORD=...
+DATABASE=...
+SYNCHRONIZE=false
+
+# S3
+AWS_ENDPOINT=...
+AWS_BUCKET_NAME=...
+AWS_PATH=...
+AWS_REGION=...
+AWS_ACCESS_KEY_ID=...
+AWS_SECRET_ACCESS_KEY=...
+
+# Telegram
+BOT_TOKEN=...
+MAIN_GROUP=...
+ERROR_LOG_CHAT_ID=...
+WEBAPP_URL=...
+```
+
+### 3) Запуск
 ```bash
 # development
-$ npm run start
+npm run start
 
 # watch mode
-$ npm run start:dev
+npm run start:dev
 
-# production mode
-$ npm run start:prod
+# production
+npm run build
+npm run start:prod
+```
+
+## Полезные команды
+```bash
+npm run build      # сборка
+npm run lint       # линтинг
+npm run test       # unit тесты
+npm run test:e2e   # e2e тесты
 ```
